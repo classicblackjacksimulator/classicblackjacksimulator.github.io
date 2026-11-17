@@ -1,0 +1,656 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Classic Blackjack Simulator | Gratis blackjack spelen met speelgeld</title>
+<meta name="description" content="Speel gratis blackjack in je browser met speelgeld. Tot drie handen tegelijk, splitsen, verdubbelen, verzekering, opgeven, sidebets (Pair, Dealer pair, 21+3), hints en een strategietabel.">
+<link rel="canonical" href="https://oledevries693-byte.github.io/classic-blackjack-simulator/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Classic Blackjack Simulator">
+<meta property="og:description" content="Gratis blackjack in je browser, met speelgeld. Oefen basisstrategie met hints en een strategietabel.">
+<meta property="og:url" content="https://oledevries693-byte.github.io/classic-blackjack-simulator/">
+<meta name="theme-color" content="#08201f">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: speeltafel, dealer boven, drie boxen naast elkaar met inzetvakken, bediening als rail onderaan. Bewust één donker thema (vilt). */
+:root{
+  --felt:#0f3b3a; --felt-deep:#08201f; --brass:#d9a441; --ivory:#f6f1e4;
+  --ink:#14181a; --red:#c2372f; --muted:#9bbab6; --win:#7fd6a2; --lose:#f08a7e;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --f-body:"DM Sans",ui-sans-serif,system-ui,sans-serif;
+  --f-mono:"DM Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 30%,var(--felt) 0%,var(--felt-deep) 85%);background-color:var(--felt-deep);color:var(--ivory);font-family:var(--f-body);font-size:15px}
+.wrap{max-width:860px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:14px;padding-block:18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));box-sizing:border-box}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,6vw,40px);margin:0;letter-spacing:-.02em}
+h1 span{color:var(--brass)}
+.bank{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.bank b{color:var(--brass);font-size:20px;font-weight:500}
+.rule{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:center;border-block:1px solid color-mix(in srgb,var(--brass) 35%,transparent);padding-block:6px}
+.lbl-h{font-family:var(--f-display);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.score{font-family:var(--f-mono);font-variant-numeric:tabular-nums;background:var(--felt-deep);border:1px solid color-mix(in srgb,var(--brass) 50%,transparent);color:var(--brass);border-radius:999px;padding:2px 10px;font-size:15px;white-space:nowrap}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tool{background:none;border:1px solid color-mix(in srgb,var(--muted) 40%,transparent);color:var(--muted);border-radius:999px;padding:4px 10px;font-size:12px;cursor:pointer}
+.tool[aria-pressed="false"]{opacity:.55;text-decoration:line-through}
+.tool:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.warn{border:1px solid var(--lose);background:color-mix(in srgb,var(--lose) 12%,transparent);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.warn p{margin:0;text-align:center;font-weight:500;text-wrap:balance}
+.warn p b{color:var(--lose)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px}
+.stat{background:color-mix(in srgb,var(--felt-deep) 80%,transparent);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--f-mono);font-size:18px;color:var(--ivory);font-weight:500;font-variant-numeric:tabular-nums}
+.stat b.pos{color:var(--win)}.stat b.neg{color:var(--lose)}
+.stat span{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.stat small{font-size:11px}
+:root{--k-hit:#e7dcc0;--k-stand:#6fbf8e;--k-dbl:#d9a441;--k-split:#7ea8dc;--k-sur:#e0766a}
+kbd{font-family:var(--f-mono);font-size:10px;border:1px solid currentColor;border-radius:4px;padding:0 4px;margin-left:6px;opacity:.6;font-weight:500}
+@media (hover:none){kbd{display:none}}
+.hintbox{border:1px solid var(--brass);border-radius:10px;padding:10px;text-align:center;background:color-mix(in srgb,var(--brass) 10%,transparent);text-wrap:balance}
+.hintbox b{color:var(--brass)}
+.rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px}
+.rules label{display:flex;flex-direction:column;gap:4px;font-size:12px;letter-spacing:.04em}
+.rules select{font:inherit;font-size:14px;letter-spacing:0;padding:8px;border-radius:8px;background:var(--felt-deep);color:var(--ivory);border:1px solid color-mix(in srgb,var(--brass) 50%,transparent)}
+.rules select:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.rules select:disabled{opacity:.5}
+.tnote{margin:8px 0 0;text-align:center}
+.tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:10px}
+.tables h3{font-family:var(--f-display);font-size:13px;color:var(--ivory);margin:0 0 4px}
+.tw{overflow-x:auto}
+.tables table{border-collapse:separate;border-spacing:2px;font-family:var(--f-mono);font-size:12px;width:100%}
+.tables th{color:var(--muted);font-weight:500;padding:2px 4px;white-space:nowrap}
+.tables th.hl{color:var(--brass);font-weight:700}
+.tables td{text-align:center;padding:3px 0;color:var(--ink);border-radius:3px;min-width:22px}
+.kH{background:var(--k-hit)}.kS{background:var(--k-stand)}.kD{background:var(--k-dbl)}.kP{background:var(--k-split)}.kR{background:var(--k-sur)}
+.kX{background:linear-gradient(135deg,var(--k-dbl) 55%,var(--k-stand) 55%)}
+.tables td.cur{outline:3px solid var(--ivory);outline-offset:-1px;font-weight:800}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:10px;font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{font-style:normal;font-family:var(--f-mono);color:var(--ink);border-radius:3px;padding:0 5px}
+.chartwrap{max-width:560px;margin:10px auto 0}
+.chart{width:100%;height:auto;display:block}
+.chart .grid{stroke:color-mix(in srgb,var(--muted) 25%,transparent);stroke-width:1}
+.chart .base{stroke:var(--muted);stroke-dasharray:4 4;stroke-width:1}
+.chart .area{fill:color-mix(in srgb,var(--brass) 16%,transparent)}
+.chart .line{fill:none;stroke:var(--brass);stroke-width:2;stroke-linejoin:round}
+.chart .dot{fill:var(--brass)}
+.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
+.empty{text-align:center;margin:10px 0 0}
+.dealer{display:flex;flex-direction:column;align-items:center;gap:8px;--cw:72px}
+.dealer-head{display:flex;gap:8px;align-items:center}
+.cards{display:flex;padding-left:2px}
+.dealer .cards{min-height:calc(var(--cw)*1.42)}
+.card{width:var(--cw);height:calc(var(--cw)*1.42);flex:none;border-radius:calc(var(--cw)*.11);background:var(--ivory);color:var(--ink);box-shadow:0 4px 10px rgb(0 0 0/.35);position:relative;margin-left:calc(var(--cw)*-.54);box-sizing:border-box}
+.dealer .card{margin-left:calc(var(--cw)*-.42)}
+.card:first-child{margin-left:0}
+.card.new{animation:deal .32s cubic-bezier(.2,.8,.3,1) both}
+.card.red{color:var(--red)}
+.card .c{position:absolute;top:5%;left:9%;font-family:var(--f-display);font-weight:800;line-height:.92;font-size:calc(var(--cw)*.37);letter-spacing:-.05em;text-align:center}
+.card .c small{display:block;font-size:calc(var(--cw)*.3);letter-spacing:0}
+.card .mid{position:absolute;right:9%;bottom:5%;font-size:calc(var(--cw)*.44);line-height:1}
+.card.back{background:repeating-linear-gradient(45deg,var(--red) 0 5px,#9d2b25 5px 10px);border:calc(var(--cw)*.06) solid var(--ivory)}
+@keyframes deal{from{transform:translate(30px,-50px) rotate(8deg);opacity:0}to{transform:none;opacity:1}}
+.msg{min-height:30px;text-align:center;font-family:var(--f-display);font-weight:800;font-size:clamp(18px,4.2vw,24px);letter-spacing:-.01em;text-wrap:balance}
+.msg.win{color:var(--win)}.msg.lose{color:var(--lose)}.msg.push{color:var(--muted)}
+.notes{text-align:center;font-size:13px;color:var(--brass);min-height:18px;margin-top:-8px}
+.seats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.seat{--cw:56px;display:flex;flex-direction:column;gap:10px;align-items:center;padding:10px 6px;border-radius:14px;border:1px solid transparent;transition:opacity .2s,border-color .2s;min-width:0}
+.seat.on{border-color:color-mix(in srgb,var(--brass) 70%,transparent);background:color-mix(in srgb,var(--brass) 7%,transparent)}
+.seat.idle{opacity:.4}
+.hands{display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:flex-end;min-height:calc(var(--cw)*1.42 + 26px);width:100%}
+.hand{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;border-radius:10px;border:1px dashed transparent}
+.hand.on{border-color:var(--brass)}
+.meta{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;align-items:center}
+.tag{font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;background:var(--felt-deep);color:var(--muted);white-space:nowrap}
+.tag.win{color:var(--felt-deep);background:var(--win)}.tag.lose{color:var(--felt-deep);background:var(--lose)}.tag.push{color:var(--ink);background:var(--muted)}
+.spots{display:flex;flex-direction:column;align-items:center;gap:8px}
+.spot{border-radius:50%;border:2px dashed color-mix(in srgb,var(--brass) 70%,transparent);background:transparent;color:var(--ivory);font-family:var(--f-mono);font-variant-numeric:tabular-nums;cursor:pointer;display:grid;place-items:center;padding:0}
+.spot.main{width:58px;height:58px;font-size:14px}
+.spot.sm{width:36px;height:36px;font-size:11px}
+.spot.has{border-style:solid;border-color:var(--brass);background:var(--felt-deep)}
+.spot.won{border-color:var(--win);color:var(--win)}
+.spot.lost{opacity:.45}
+.spot:disabled{cursor:default}
+.spot:not(:disabled):hover{background:color-mix(in srgb,var(--brass) 15%,var(--felt-deep))}
+.sides{display:flex;gap:6px}
+.side{display:flex;flex-direction:column;align-items:center;gap:2px}
+.side .l{font-size:10px;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
+.side .l.win{color:var(--win);font-weight:700}
+.seat-foot{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.x{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12px;padding:2px}
+.rail{margin-top:auto;background:color-mix(in srgb,var(--felt-deep) 80%,transparent);border:1px solid color-mix(in srgb,var(--brass) 30%,transparent);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center}
+.hint{font-size:12px;color:var(--muted);text-align:center}
+.chip{width:48px;height:48px;border-radius:50%;border:4px dashed var(--ivory);font-family:var(--f-mono);font-weight:500;font-size:13px;color:var(--ivory);cursor:pointer;box-shadow:0 3px 0 rgb(0 0 0/.4);transition:transform .12s}
+.chip[data-v="5"]{background:var(--red)}.chip[data-v="25"]{background:#2f7a4f}.chip[data-v="100"]{background:var(--ink)}.chip[data-v="500"]{background:#6a3f9a}
+.chip[aria-pressed="true"]{transform:translateY(-5px);outline:3px solid var(--brass);outline-offset:2px}
+button{font-family:var(--f-body)}
+.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:700;font-size:15px;cursor:pointer;background:var(--ivory);color:var(--ink);min-width:86px}
+.btn.primary{background:var(--brass)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid color-mix(in srgb,var(--muted) 40%,transparent)}
+.btn:disabled,.chip:disabled{opacity:.35;cursor:not-allowed}
+.btn:focus-visible,.chip:focus-visible,.spot:focus-visible,.x:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+details{font-size:13px;color:var(--muted)}
+summary{cursor:pointer;text-align:center;letter-spacing:.06em;text-transform:uppercase;font-size:11px}
+.pay{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:10px}
+.pay h3{font-family:var(--f-display);font-size:13px;color:var(--ivory);margin:0 0 4px}
+.pay table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.pay td{padding:2px 0}.pay td:last-child{text-align:right;font-family:var(--f-mono);color:var(--brass)}
+@media (max-width:560px){
+  .dealer{--cw:54px}.seat{--cw:40px;padding:8px 2px}.seats{gap:4px}
+  .spot.main{width:46px;height:46px;font-size:12px}.spot.sm{width:30px;height:30px;font-size:10px}
+  .sides{gap:3px}.side .l{font-size:9px}.score{font-size:13px;padding:1px 7px}.tag{font-size:10px;padding:1px 5px}
+  .btn{min-width:0;flex:1;padding:11px 10px}
+}
+@media (prefers-reduced-motion:reduce){.card.new{animation:none}}
+h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
+.site-foot{border-top:1px solid color-mix(in srgb,var(--brass) 25%,transparent);padding-top:14px;color:var(--muted);font-size:13px;line-height:1.55;max-width:65ch;margin:4px auto 0;text-align:center}
+.site-foot h2{font-family:var(--f-display);font-size:15px;color:var(--ivory);margin:0 0 6px}
+.site-foot p{margin:0 0 8px}
+.site-foot strong{color:var(--brass);font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1><span class="k">Classic</span> Black<span>jack</span> <span class="k">Simulator</span></h1>
+    <div class="tools">
+      <button class="tool" id="soundBtn" aria-pressed="true">Geluid</button>
+      <button class="tool" id="tipsBtn" aria-pressed="true">Waarschuwingen</button>      <div class="bank">Saldo <b id="bank">€1000</b></div>
+    </div>
+  </header>
+  <div class="rule" id="ruleLine">Blackjack 3 : 2 · Dealer staat op 17 · Verzekering 2 : 1 · Opgeven toegestaan</div>
+
+  <section class="dealer">
+    <div class="dealer-head"><h2 class="lbl-h">Dealer</h2><span class="score" id="dscore">–</span></div>
+    <div class="cards" id="dealer"></div>
+  </section>
+
+  <div class="msg" id="msg" aria-live="polite"></div>
+  <div class="notes" id="notes"></div>
+
+  <section class="seats" id="seats"></section>
+
+  <div class="rail">
+    <div class="row" id="chipRow">
+      <button class="chip" data-v="5" id="c5">5</button>
+      <button class="chip" data-v="25" id="c25">25</button>
+      <button class="chip" data-v="100" id="c100">100</button>
+      <button class="chip" data-v="500" id="c500">500</button>
+    </div>
+    <div class="row" id="betCtl">
+      <button class="btn ghost" id="clearAll">Wis alles</button>
+      <button class="btn ghost" id="rebet">Herhaal inzet<kbd>H</kbd></button>
+      <button class="btn primary" id="deal">Delen<kbd>spatie</kbd></button>
+    </div>
+    <div class="row" id="insCtl" hidden>
+      <button class="btn primary" id="insYes">Verzekeren</button>
+      <button class="btn" id="insNo">Geen verzekering<kbd>N</kbd></button>
+    </div>
+    <div class="hintbox" id="hintBox" hidden><b>Advies:</b> <span id="hintText"></span> <button class="x" id="showTable">bekijk in tabel</button></div>
+    <div class="row" id="playCtl" hidden>
+      <button class="btn" id="hit">Kaart<kbd>K</kbd></button>
+      <button class="btn" id="stand">Pas<kbd>P</kbd></button>
+      <button class="btn" id="double">Verdubbel<kbd>V</kbd></button>
+      <button class="btn" id="split">Splits<kbd>S</kbd></button>
+      <button class="btn" id="surrender">Opgeven<kbd>O</kbd></button>
+      <button class="btn ghost" id="hintBtn">Hint<kbd>?</kbd></button>
+    </div>
+    <div class="warn" id="warnCtl" hidden>
+      <p><b>Let op:</b> <span id="warnText"></span></p>
+      <div class="row"><button class="btn primary" id="warnCancel">Toch niet</button><button class="btn ghost" id="warnGo">Toch doen</button></div>
+    </div>
+    <div class="row" id="doneCtl" hidden>
+      <button class="btn ghost" id="newRound">Nieuwe inzet<kbd>N</kbd></button>
+      <button class="btn primary" id="again">Zelfde inzet &amp; delen<kbd>spatie</kbd></button>
+    </div>    <div class="hint" id="hint"></div>
+  </div>
+
+  <details id="statsBox">
+    <summary id="statsSum">Statistieken</summary>
+    <div class="chartwrap" id="chart"></div>
+    <div class="stats" id="stats"></div>
+    <div class="row" style="margin-top:10px"><button class="btn ghost" id="resetStats">Statistieken wissen</button></div>
+  </details>
+
+  <details id="rulesBox">
+    <summary>Huisregels</summary>
+    <div class="rules">
+      <label for="rDecks">Aantal kaartspellen<select id="rDecks"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
+      <label for="rH17">Dealer bij zacht 17<select id="rH17"><option value="0">Past</option><option value="1">Neemt een kaart</option></select></label>
+      <label for="rBJ">Blackjack betaalt<select id="rBJ"><option value="1.5">3 : 2</option><option value="1.2">6 : 5</option></select></label>
+      <label for="rDbl">Verdubbelen<select id="rDbl"><option value="0">Op elke twee kaarten</option><option value="1">Alleen op 9, 10 of 11</option></select></label>
+    </div>
+    <p class="tnote">Je past de regels aan tussen rondes. Bij een ander aantal kaartspellen wordt de schoen opnieuw geschud.</p>
+  </details>
+
+  <details id="tableBox">
+    <summary>Strategietabel</summary>
+    <p class="tnote" id="tableNote"></p>
+    <div class="tables" id="tables"></div>
+    <div class="legend">
+      <span><i class="kH">K</i>Kaart</span><span><i class="kS">P</i>Pas</span><span><i class="kD">V</i>Verdubbel, anders kaart</span>
+      <span><i class="kX">Vp</i>Verdubbel, anders pas</span><span><i class="kP">Sp</i>Splits</span><span><i class="kR">O</i>Opgeven, anders kaart</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Uitbetalingen sidebets</summary>
+    <div class="pay">
+      <div><h3>Pair</h3><table>
+        <tr><td>Perfecte pair (zelfde kleur en teken)</td><td>25 : 1</td></tr>
+        <tr><td>Gekleurde pair (zelfde kleur)</td><td>12 : 1</td></tr>
+        <tr><td>Gemengde pair</td><td>6 : 1</td></tr></table></div>
+      <div><h3>21+3</h3><table>
+        <tr><td>Drie gelijke, zelfde teken</td><td>100 : 1</td></tr>
+        <tr><td>Straight flush</td><td>40 : 1</td></tr>
+        <tr><td>Drie gelijke</td><td>30 : 1</td></tr>
+        <tr><td>Straight</td><td>10 : 1</td></tr>
+        <tr><td>Flush</td><td>5 : 1</td></tr></table></div>
+      <div><h3>Dealer pair</h3><table>
+        <tr><td>Eerste twee dealerkaarten een paar</td><td>11 : 1</td></tr></table>
+        <p style="margin:6px 0 0">Pair en 21+3 worden direct na het delen afgerekend, dealer pair aan het eind van de ronde. Sidebets kan alleen met een hoofdinzet op die box.</p></div>
+    </div>
+  </details>
+
+  <footer class="site-foot">
+    <h2>Over Classic Blackjack Simulator</h2>
+    <p>Speel gratis blackjack in je browser, zonder downloaden of account. Speel op maximaal drie handen tegelijk tegen de dealer, met splitsen, verdubbelen, verzekering en opgeven, plus de sidebets Pair, Dealer pair en 21+3.</p>
+    <p>Oefen de basisstrategie met de hint-knop en de strategietabel, kies je eigen huisregels en volg je resultaten in de statistieken.</p>
+    <p><strong>Je speelt met speelgeld.</strong> Er wordt geen echt geld ingezet of uitbetaald, en je kunt niets kopen of winnen.</p>
+  </footer>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const SUITS=[["♠",0],["♥",1],["♦",1],["♣",0]];
+const RANKS=["A","2","3","4","5","6","7","8","9","10","B","V","H"]; // Boer, Vrouw, Heer
+const SPOTS=["bet","pair","t213","dp"];
+const mkSeat=()=>({bet:0,pair:0,t213:0,dp:0,ins:0,hands:[],res:{}});
+let S={bank:1000,phase:"bet",chip:25,shoe:[],uid:0,dealer:[],seats:[mkSeat(),mkSeat(),mkSeat()],cur:null,insSeat:null,
+  msg:"Kies een fiche en klik op een inzetvak",cls:"",notes:[],last:null,startBank:1000,pending:null,sfxEnd:null,hint:null};
+const S_DEF={pending:null,sfxEnd:null,hint:null};
+let P={sound:true,tips:true,rules:{decks:6,h17:false,bj:1.5,dbl911:false}};
+const R=()=>P.rules;
+const ST0=()=>({decisions:0,correct:0,hints:0,surrenders:0,hist:[],rounds:0,hands:0,wins:0,losses:0,pushes:0,bj:0,busts:0,doubles:0,doubleWins:0,splits:0,sideBets:0,sideWins:0,sideWon:0,insTaken:0,insWon:0,net:0,bestRound:0,worstRound:0,peak:1000,streak:0,bestStreak:0,ignored:0});
+let ST=ST0();
+
+// ---------- geluid (WebAudio, alles gesynthetiseerd) ----------
+let AC=null,armed=false;
+addEventListener("pointerdown",()=>{armed=true;ac()},{capture:true});
+addEventListener("keydown",()=>{armed=true;ac()},{capture:true});
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==="suspended")AC.resume();return AC}
+function env(g,t,vol,dur){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur)}
+function tone(f,dur,type,vol,when,f2){const a=ac();if(!a)return;const t=a.currentTime+(when||0),o=a.createOscillator(),g=a.createGain();
+  o.type=type||"sine";o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);env(g,t,vol||.12,dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.05)}
+function noise(dur,vol,when,freq){const a=ac();if(!a)return;const t=a.currentTime+(when||0),n=Math.ceil(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
+  for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
+  s.buffer=b;f.type="bandpass";f.frequency.value=freq||2500;f.Q.value=.8;env(g,t,vol,dur);s.connect(f).connect(g).connect(a.destination);s.start(t)}
+const SFX={
+  card:w=>noise(.07,.35,w,2800),
+  chip:w=>{tone(2300,.05,"triangle",.07,w);tone(3200,.06,"triangle",.05,(w||0)+.035)},
+  win:w=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,"triangle",.1,w+i*.08)),
+  bj:w=>{[523,659,784,1047,1319].forEach((f,i)=>tone(f,.25,"triangle",.1,w+i*.06));tone(2093,.5,"sine",.05,w+.35)},
+  lose:w=>{tone(311,.3,"sawtooth",.05,w,247);tone(233,.45,"sawtooth",.05,w+.22,175)},
+  push:w=>{tone(440,.15,"sine",.08,w);tone(440,.15,"sine",.08,w+.18)},
+  bust:w=>noise(.25,.3,w,300),
+  warn:w=>{tone(880,.09,"square",.04,w);tone(660,.12,"square",.04,(w||0)+.12)}
+};
+function sfx(name,when){if(P.sound&&armed&&SFX[name])SFX[name](when||0)}
+
+// ---------- kaarten ----------
+function newShoe(){const d=[];for(let n=0;n<R().decks;n++)for(const[s,red]of SUITS)for(const r of RANKS)d.push({r,s,red});
+  for(let i=d.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[d[i],d[j]]=[d[j],d[i]]}return d}
+function draw(){
+  if(S.shoe.length<Math.max(15,Math.round(R().decks*52*.2))){S.shoe=newShoe();if(S.uid)S.notes.push("Nieuwe schoen geschud")}
+  const c=S.shoe.pop();c.u=++S.uid;return c}
+const val=c=>c.r==="A"?11:isNaN(c.r)?10:+c.r;
+const ridx=c=>RANKS.indexOf(c.r)+1;
+function tot(cards){let t=0,a=0;for(const c of cards){t+=val(c);if(c.r==="A")a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
+const scoreText=cards=>{const{t,soft}=tot(cards);return soft&&t<21?`${t-10}/${t}`:`${t}`};
+const natural=h=>!h.split&&h.cards.length===2&&tot(h.cards).t===21;
+const tableBets=()=>S.seats.reduce((a,s)=>a+s.bet+s.pair+s.t213+s.dp,0);
+
+// ---------- sidebets ----------
+function pairRes(a,b){if(a.r!==b.r)return null;if(a.s===b.s)return{name:"Perfecte pair",mult:25};if(a.red===b.red)return{name:"Gekleurde pair",mult:12};return{name:"Gemengde pair",mult:6}}
+function t213Res(cs){
+  const flush=cs.every(c=>c.s===cs[0].s),trips=cs.every(c=>c.r===cs[0].r);
+  const v=cs.map(ridx).sort((x,y)=>x-y);
+  const straight=(v[0]+1===v[1]&&v[1]+1===v[2])||(v[0]===1&&v[1]===12&&v[2]===13);
+  if(trips&&flush)return{name:"Drie gelijke, zelfde teken",mult:100};
+  if(straight&&flush)return{name:"Straight flush",mult:40};
+  if(trips)return{name:"Drie gelijke",mult:30};
+  if(straight)return{name:"Straight",mult:10};
+  if(flush)return{name:"Flush",mult:5};
+  return null}
+function settleSide(s,i,key,r){const stake=s[key];if(!stake)return;ST.sideBets++;
+  if(r){const win=stake*r.mult;S.bank+=stake+win;s.res[key]={win};ST.sideWins++;ST.sideWon+=win;S.notes.push(`Box ${i+1}: ${r.name} +€${win}`)}
+  else s.res[key]={win:0}}
+
+// ---------- inzetten ----------
+function addBet(i,spot){
+  if(S.phase==="done")newRound();
+  if(S.phase!=="bet")return;
+  const s=S.seats[i];
+  if(spot!=="bet"&&!s.bet){S.msg=`Zet eerst een hoofdinzet op box ${i+1}`;S.cls="";return render()}
+  if(S.chip>S.bank){S.msg="Niet genoeg saldo voor dit fiche";S.cls="lose";return render()}
+  s[spot]+=S.chip;S.bank-=S.chip;sfx("chip");S.msg="Klaar? Klik op Delen";S.cls="";render()}
+function clearSeat(i){const s=S.seats[i];for(const k of SPOTS){S.bank+=s[k];s[k]=0}render()}
+function clearAll(){S.seats.forEach(s=>{for(const k of SPOTS){S.bank+=s[k];s[k]=0}})}
+function newRound(){S.phase="bet";S.dealer=[];S.cur=null;S.insSeat=null;S.notes=[];
+  S.seats.forEach(s=>{s.hands=[];s.res={};s.ins=0;for(const k of SPOTS)s[k]=0});seen.clear();
+  S.msg="Kies een fiche en klik op een inzetvak";S.cls=""}
+function placeLast(){if(!S.last)return false;clearAll();
+  const need=S.last.reduce((a,b)=>a+b.bet+b.pair+b.t213+b.dp,0);
+  if(need>S.bank){S.msg="Niet genoeg saldo voor dezelfde inzet";S.cls="lose";return false}
+  S.last.forEach((b,i)=>{for(const k of SPOTS)S.seats[i][k]=b[k]});S.bank-=need;sfx("chip");return true}
+
+// ---------- ronde ----------
+function deal(){
+  if(!S.seats.some(s=>s.bet))return;
+  S.last=S.seats.map(s=>({bet:s.bet,pair:s.pair,t213:s.t213,dp:s.dp}));
+  S.startBank=S.bank+tableBets();S.notes=[];S.dealer=[];S.hint=null;
+  S.seats.forEach(s=>{s.res={};s.ins=0;s.hands=s.bet?[{cards:[],bet:s.bet,done:false,split:false}]:[]});
+  for(let n=0;n<2;n++){S.seats.forEach(s=>{if(s.bet)s.hands[0].cards.push(draw())});S.dealer.push(draw())}
+  S.seats.forEach((s,i)=>{if(!s.bet)return;const[a,b]=s.hands[0].cards;
+    settleSide(s,i,"pair",pairRes(a,b));settleSide(s,i,"t213",t213Res([a,b,S.dealer[0]]))});
+  if(S.dealer[0].r==="A"){S.phase="ins";S.insSeat=nextInsSeat(-1);S.msg="De dealer toont een aas";S.cls="";return render()}
+  afterIns()}
+function nextInsSeat(from){for(let i=from+1;i<3;i++)if(S.seats[i].bet)return i;return null}
+function insDecide(yes){const s=S.seats[S.insSeat];
+  ST.decisions++;S.hint=null;
+  if(yes){const a=Math.floor(s.bet/2);if(a<=S.bank){S.bank-=a;s.ins=a;ST.insTaken++;sfx("chip")}
+    S.notes.push(`Box ${S.insSeat+1}: verzekering, basisstrategie zegt geen verzekering`)}
+  else ST.correct++;
+  S.insSeat=nextInsSeat(S.insSeat);if(S.insSeat==null)afterIns();else render()}
+function afterIns(){
+  S.insSeat=null;const up=S.dealer[0];
+  if(up.r==="A"||val(up)===10){
+    if(tot(S.dealer).t===21)return settle();
+    if(S.seats.some(s=>s.ins)){S.notes.push("Dealer heeft geen blackjack: verzekering verloren");S.seats.forEach(s=>{if(s.ins)s.res.ins={win:0}})}
+  }
+  S.phase="play";
+  S.seats.forEach(s=>s.hands.forEach(h=>{if(tot(h.cards).t===21)h.done=true}));
+  next()}
+function findNext(){for(let i=0;i<3;i++){const hs=S.seats[i].hands;for(let j=0;j<hs.length;j++)if(!hs[j].done)return{s:i,h:j}}return null}
+function curHand(){return S.seats[S.cur.s].hands[S.cur.h]}
+function next(){S.cur=findNext();if(!S.cur)return dealerPlay();
+  const seat=S.seats[S.cur.s],h=curHand(),n=seat.hands.length;
+  S.msg=`Box ${S.cur.s+1}${n>1?` (hand ${S.cur.h+1}/${n})`:""}: ${scoreText(h.cards)}`;S.cls="";render()}
+const canDouble=h=>{if(h.cards.length!==2||h.splitAces||S.bank<h.bet)return false;if(!R().dbl911)return true;const t=tot(h.cards).t;return t>=9&&t<=11};
+const dealerHits=()=>{const{t,soft}=tot(S.dealer);return t<17||(R().h17&&t===17&&soft)};
+const canSplit=(seat,h)=>h.cards.length===2&&val(h.cards[0])===val(h.cards[1])&&!h.splitAces&&seat.hands.length<4&&S.bank>=h.bet;
+function hit(){const h=curHand();h.cards.push(draw());const t=tot(h.cards).t;if(t>21)S.sfxEnd="bust";if(t>=21)h.done=true;next()}
+function stand(){curHand().done=true;next()}
+function dbl(){const h=curHand();if(!canDouble(h))return;S.bank-=h.bet;h.bet*=2;h.doubled=true;ST.doubles++;sfx("chip");h.cards.push(draw());if(tot(h.cards).t>21)S.sfxEnd="bust";h.done=true;next()}
+function split(){const seat=S.seats[S.cur.s],h=curHand();if(!canSplit(seat,h))return;
+  S.bank-=h.bet;ST.splits++;sfx("chip");const nh={cards:[h.cards.pop()],bet:h.bet,done:false,split:true};h.split=true;
+  seat.hands.splice(S.cur.h+1,0,nh);h.cards.push(draw());nh.cards.push(draw());
+  const aces=h.cards[0].r==="A";
+  for(const x of[h,nh]){if(aces){x.splitAces=true;x.done=true}if(tot(x.cards).t===21)x.done=true}
+  next()}
+const canSurrender=(seat,h)=>h.cards.length===2&&!h.split&&seat.hands.length===1;
+function surrender(){const seat=S.seats[S.cur.s],h=curHand();if(!canSurrender(seat,h))return;h.surrendered=true;h.done=true;next()}
+
+// ---------- basisstrategie (meerdere decks, verdubbelen na splitsen, late surrender; past zich aan op S17/H17) ----------
+// Kolommen: dealer 2,3,4,5,6,7,8,9,10,A. H kaart, S pas, D verdubbel/anders kaart, X verdubbel/anders pas, P splits, R opgeven/anders kaart
+const COLS=["2","3","4","5","6","7","8","9","10","A"];
+const HARD0={8:"HHHHHHHHHH",9:"HDDDDHHHHH",10:"DDDDDDDDHH",11:"DDDDDDDDDH",12:"HHSSSHHHHH",13:"SSSSSHHHHH",14:"SSSSSHHHHH",15:"SSSSSHHHRH",16:"SSSSSHHRRR",17:"SSSSSSSSSS",18:"SSSSSSSSSS"};
+const SOFT0={12:"HHHHHHHHHH",13:"HHHDDHHHHH",14:"HHHDDHHHHH",15:"HHDDDHHHHH",16:"HHDDDHHHHH",17:"HDDDDHHHHH",18:"SXXXXSSHHH",19:"SSSSSSSSSS",20:"SSSSSSSSSS",21:"SSSSSSSSSS"};
+const PAIRS={2:"PPPPPPHHHH",3:"PPPPPPHHHH",4:"HHHPPHHHHH",5:"DDDDDDDDHH",6:"PPPPPHHHHH",7:"PPPPPPHHHH",8:"PPPPPPPPPP",9:"PPPPPSPPSS",10:"SSSSSSSSSS",11:"PPPPPPPPPP"};
+function T(){if(!R().h17)return{HARD:HARD0,SOFT:SOFT0,PAIRS};
+  return{HARD:{...HARD0,11:"DDDDDDDDDD",15:"SSSSSHHHRR",17:"SSSSSSSSSR"},SOFT:{...SOFT0,18:"XXXXXSSHHH",19:"SSSSXSSSSS"},PAIRS}}
+const NAME={hit:"Kaart",stand:"Pas",double:"Verdubbel",split:"Splits",surrender:"Opgeven"};
+function advise(seat,h){
+  const up=val(S.dealer[0]),col=up===11?9:up-2,{t,soft}=tot(h.cards),c=h.cards;
+  let tbl,key,code;const{HARD,SOFT}=T();
+  const pv=c.length===2&&val(c[0])===val(c[1])?val(c[0]):0;
+  if(pv&&(PAIRS[pv][col]!=="P"||canSplit(seat,h))){tbl="pair";key=pv;code=PAIRS[pv][col]}
+  else if(soft){tbl="soft";key=t;code=SOFT[t][col]}
+  else{tbl="hard";key=Math.min(18,Math.max(8,t));code=HARD[key][col]}
+  let action={H:"hit",S:"stand",P:"split"}[code];
+  if(code==="D")action=canDouble(h)?"double":"hit";
+  if(code==="X")action=canDouble(h)?"double":"stand";
+  if(code==="R")action=canSurrender(seat,h)?"surrender":"hit";
+  return{action,tbl,key,col,t,soft,up,pv}}
+function reason(a){
+  const upN=a.up===11?"een aas":`een ${a.up}`,weak=a.up<=6,sv=(a.soft?"zacht ":"")+a.t;
+  switch(a.action){
+    case"split":return a.pv===11?"twee azen splitsen geeft je twee kansen op 21.":a.pv===8?"twee achten zijn samen 16, de slechtste hand. Apart zijn ze een veel betere start."
+      :weak?`de dealer staat zwak met ${upN}. Met twee handen profiteer je daar twee keer van.`:"apart zijn deze kaarten een sterkere start dan samen.";
+    case"double":return`met ${sv} heb je een goede kans op een sterke hand met één kaart${weak?`, en de dealer staat zwak met ${upN}`:""}. Zet dubbel in.`;
+    case"surrender":return`met ${a.t} tegen ${upN} verlies je deze hand meestal. Opgeven kost maar de helft van je inzet.`;
+    case"stand":return a.soft?`zacht ${a.t} is al een goede hand tegen ${upN}.`:a.t>=17?`${a.t} is sterk genoeg. Met nog een kaart ga je vaak kapot.`
+      :`de dealer toont ${upN} en moet doorpakken tot 17, met een grote kans om kapot te gaan. Laat hem dat risico nemen.`;
+    default:return a.t<=11?`met ${a.t} kun je niet kapot gaan.`:a.soft?`met ${sv} kun je niet kapot gaan en kun je je hand nog verbeteren.`
+      :`tegen ${upN} eindigt de dealer vaak op 17 of meer. Met ${a.t} moet je je hand verbeteren.`}}
+function showHint(){
+  if(S.phase==="ins"){S.hint="geen verzekering. Verzekering is op de lange duur altijd een verliezende gok, ook als je zelf blackjack hebt.";ST.hints++;return render()}
+  if(S.phase!=="play"||S.pending)return;
+  const a=advise(S.seats[S.cur.s],curHand());S.hint=`${NAME[a.action]}: ${reason(a)}`;ST.hints++;render()}
+
+// ---------- waarschuwingen: alleen bij overduidelijke fouten ----------
+function mistake(action){
+  const h=curHand(),{t,soft}=tot(h.cards);
+  if(action==="surrender"&&(t<=11||soft||t>=19))return`met ${soft?"zacht ":""}${t} heb je nog prima kansen. Opgeven kost je direct de helft van je inzet.`;
+  if(action==="hit"&&!soft&&t>=17)return`je hebt ${t}. Met nog een kaart ga je ${t>=19?"vrijwel zeker":"waarschijnlijk"} kapot.`;
+  if(action==="stand"&&t<=11)return`je hebt pas ${t}. Met een extra kaart kun je nooit kapot gaan.`;
+  if(action==="stand"&&soft&&t<=16)return`je hebt zacht ${t} (${t-10}/${t}). Je aas kan als 1 tellen, dus een extra kaart kan je niet kapot maken.`;
+  if(action==="double"&&t>=20)return`je hebt al ${t}. Verdubbelen geeft je nog maar één kaart en maakt een sterke hand alleen slechter.`;
+  if(action==="double"&&!soft&&t>=17)return`met ${t} verdubbel je je inzet terwijl de extra kaart je waarschijnlijk kapot maakt.`;
+  if(action==="split"&&val(h.cards[0])===10)return`twee tienen zijn samen 20, een van de sterkste handen. Splitsen gooit dat weg.`;
+  if(action==="split"&&h.cards[0].r==="5")return`twee vijven zijn samen 10, ideaal om op te verdubbelen. Gesplitst heb je twee zwakke handen.`;
+  return null}
+const ACTIONS={hit,stand,double:dbl,split,surrender};
+function act(name){if(S.phase!=="play"||S.pending)return;const seat=S.seats[S.cur.s],h=curHand();
+  if((name==="double"&&!canDouble(h))||(name==="split"&&!canSplit(seat,h))||(name==="surrender"&&!canSurrender(seat,h)))return;
+  const w=P.tips&&mistake(name);
+  if(w){S.pending={name,text:w};sfx("warn");return render()}doAction(name)}
+function doAction(name){const a=advise(S.seats[S.cur.s],curHand());ST.decisions++;
+  if(a.action===name)ST.correct++;else S.notes.push(`Box ${S.cur.s+1}: ${NAME[name]}, basisstrategie zegt ${NAME[a.action]}`);
+  S.hint=null;ACTIONS[name]()}
+function confirmPending(go){const p=S.pending;S.pending=null;if(go&&p){ST.ignored++;doAction(p.name)}else render()}
+
+function dealerPlay(){
+  const alive=S.seats.some(s=>s.hands.some(h=>!h.surrendered&&tot(h.cards).t<=21&&!natural(h)));
+  if(alive)while(dealerHits())S.dealer.push(draw());
+  settle()}
+function settle(){
+  S.phase="done";S.cur=null;
+  const d=tot(S.dealer).t,dBJ=S.dealer.length===2&&d===21;let anyBJ=false;
+  S.seats.forEach((s,i)=>{
+    if(!s.bet)return;
+    if(s.ins&&dBJ){const w=s.ins*2;S.bank+=s.ins*3;s.res.ins={win:w};ST.insWon++;S.notes.push(`Box ${i+1}: verzekering +€${w}`)}
+    s.hands.forEach(h=>{const t=tot(h.cards).t,nat=natural(h);let pay=0,label,cls;
+      if(h.surrendered){pay=Math.ceil(h.bet/2);label="Opgegeven";cls="push"}
+      else if(t>21){label="Kapot";cls="lose"}
+      else if(dBJ){if(nat){pay=h.bet;label="Push";cls="push"}else{label="Dealer BJ";cls="lose"}}
+      else if(nat){const w=Math.floor(h.bet*R().bj);pay=h.bet+w;label=`Blackjack +€${w}`;cls="win"}
+      else if(d>21||t>d){pay=h.bet*2;label=`+€${h.bet}`;cls="win"}
+      else if(t<d){label="Verloren";cls="lose"}
+      else{pay=h.bet;label="Push";cls="push"}
+      S.bank+=pay;h.res={label,cls};ST.hands++;
+      if(h.surrendered)ST.surrenders++;
+      else if(cls==="win"){ST.wins++;if(nat){ST.bj++;anyBJ=true}if(h.doubled)ST.doubleWins++}
+      else if(cls==="lose"){ST.losses++;if(t>21)ST.busts++}else ST.pushes++});
+    const[a,b]=S.dealer;settleSide(s,i,"dp",a.r===b.r?{name:"Dealer pair",mult:11}:null);
+  });
+  const net=S.bank-S.startBank;
+  S.msg=(dBJ?"Dealer heeft blackjack. ":d>21?"Dealer kapot! ":"")+(net>0?`Ronde: +€${net}`:net<0?`Ronde: −€${-net}`:"Ronde: gelijk");
+  S.cls=net>0?"win":net<0?"lose":"push";
+  ST.rounds++;ST.net+=net;ST.bestRound=Math.max(ST.bestRound,net);ST.worstRound=Math.min(ST.worstRound,net);
+  if(net>0){ST.streak++;ST.bestStreak=Math.max(ST.bestStreak,ST.streak)}else if(net<0)ST.streak=0;
+  ST.peak=Math.max(ST.peak,S.bank);
+  S.sfxEnd=anyBJ&&net>0?"bj":net>0?"win":net<0?"lose":"push";
+  if(!ST.hist.length)ST.hist.push(S.startBank);ST.hist.push(S.bank);
+  if(S.bank<5){S.bank+=1000;S.notes.push("Saldo op: je krijgt €1000 erbij");ST.hist.push(S.bank)}
+  if(ST.hist.length>300)ST.hist.splice(0,ST.hist.length-300);
+  render()}
+
+// ---------- weergave ----------
+const seen=new Set();let minNew=Infinity,newKeys=[],newDelays=[];
+function cardHTML(c,hidden){
+  const key=(hidden?"b":"f")+c.u,isNew=!seen.has(key);newKeys.push(key);
+  const dl=Math.max(0,(c.u-minNew)*0.1);if(isNew)newDelays.push(dl);
+  const st=isNew?` style="animation-delay:${dl.toFixed(2)}s"`:"";
+  if(hidden)return`<div class="card back${isNew?" new":""}"${st} aria-label="Verborgen kaart"></div>`;
+  return`<div class="card${c.red?" red":""}${isNew?" new":""}"${st} aria-label="${c.r} ${c.s}"><span class="c">${c.r}<small>${c.s}</small></span><span class="mid">${c.s}</span></div>`}
+function render(){
+  const hide=S.phase==="ins"||S.phase==="play",betting=S.phase==="bet"||S.phase==="done";
+  // bepaal welke kaarten nieuw zijn, voor gespreide deel-animatie
+  minNew=Infinity;newKeys=[];newDelays=[];
+  const chk=(c,h)=>{if(!seen.has((h?"b":"f")+c.u))minNew=Math.min(minNew,c.u)};
+  S.dealer.forEach((c,i)=>chk(c,hide&&i===1));S.seats.forEach(s=>s.hands.forEach(h=>h.cards.forEach(c=>chk(c,false))));
+  $("dealer").innerHTML=S.dealer.map((c,i)=>cardHTML(c,hide&&i===1)).join("");
+  $("dscore").textContent=!S.dealer.length?"–":hide?val(S.dealer[0]):scoreText(S.dealer);
+  $("seats").innerHTML=S.seats.map((s,i)=>{
+    const on=(S.cur&&S.cur.s===i)||S.insSeat===i,idle=!betting&&!s.bet;
+    const hands=s.hands.map((h,j)=>{const act=S.cur&&S.cur.s===i&&S.cur.h===j;
+      return`<div class="hand${act?" on":""}"><div class="cards">${h.cards.map(c=>cardHTML(c,false)).join("")}</div>
+      <div class="meta"><span class="score">${scoreText(h.cards)}</span>${s.hands.length>1||h.doubled?`<span class="tag">€${h.bet}${h.doubled?" 2×":""}</span>`:""}${h.res?`<span class="tag ${h.res.cls}">${h.res.label}</span>`:""}</div></div>`}).join("");
+    const side=(k,l)=>{const r=s.res[k],cls=r?(r.win?" won":" lost"):"";
+      return`<div class="side"><button class="spot sm${s[k]?" has":""}${cls}" data-seat="${i}" data-spot="${k}" ${betting?"":"disabled"} aria-label="${l} inzet box ${i+1}">${s[k]||""}</button><span class="l${r&&r.win?" win":""}">${r&&r.win?"+€"+r.win:l}</span></div>`};
+    const ins=s.ins?`<span class="tag${s.res.ins?(s.res.ins.win?" win":" lose"):""}">Verz. €${s.ins}</span>`:"";
+    return`<div class="seat${on?" on":""}${idle?" idle":""}">
+      <div class="hands">${hands}</div>
+      <div class="spots"><button class="spot main${s.bet?" has":""}" data-seat="${i}" data-spot="bet" ${betting?"":"disabled"} aria-label="Hoofdinzet box ${i+1}">${s.bet?"€"+s.bet:"+"}</button>
+      <div class="sides">${side("pair","Pair")}${side("t213","21+3")}${side("dp","D-pair")}</div></div>
+      <div class="seat-foot">Box ${i+1}${ins}${S.phase==="bet"&&(s.bet||s.pair||s.t213||s.dp)?` <button class="x" data-clear="${i}">wis</button>`:""}</div></div>`}).join("");
+  newKeys.forEach(k=>seen.add(k));
+  newDelays.forEach(dl=>sfx("card",dl));
+  if(S.sfxEnd){sfx(S.sfxEnd,(newDelays.length?Math.max(...newDelays):0)+.35);S.sfxEnd=null}
+  $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=P.sound?"Geluid aan":"Geluid uit";
+  $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=P.tips?"Waarschuwingen aan":"Waarschuwingen uit";
+  $("warnCtl").hidden=!S.pending;if(S.pending)$("warnText").textContent=S.pending.text;
+  renderStats();renderExtras();
+  $("bank").textContent="€"+S.bank;
+  $("msg").textContent=S.msg;$("msg").className="msg "+S.cls;
+  $("notes").textContent=S.notes.slice(-3).join(" · ");
+  $("chipRow").hidden=!betting;
+  document.querySelectorAll(".chip").forEach(c=>{c.setAttribute("aria-pressed",+c.dataset.v===S.chip);c.disabled=+c.dataset.v>S.bank&&S.phase==="bet"});
+  $("betCtl").hidden=S.phase!=="bet";$("insCtl").hidden=S.phase!=="ins";$("playCtl").hidden=S.phase!=="play"||!!S.pending;$("doneCtl").hidden=S.phase!=="done";
+  $("deal").disabled=!S.seats.some(s=>s.bet);
+  $("clearAll").disabled=!tableBets();
+  $("rebet").disabled=!S.last;
+  if(S.phase==="ins"){const a=Math.floor(S.seats[S.insSeat].bet/2);$("insYes").innerHTML=`Verzekeren box ${S.insSeat+1} (€${a})<kbd>J</kbd>`;$("insYes").disabled=a>S.bank}
+  if(S.phase==="play"){const seat=S.seats[S.cur.s],h=curHand();$("double").disabled=!canDouble(h);$("split").disabled=!canSplit(seat,h);$("surrender").disabled=!canSurrender(seat,h)}
+  $("again").disabled=!S.last;
+  $("hint").textContent=S.phase==="bet"?"Speel op één, twee of drie boxen. Klik een vak om het gekozen fiche in te zetten. Toetsen 1 tot 4 kiezen een fiche."
+    :S.phase==="ins"?"Verzekering kost de helft van je inzet en betaalt 2 : 1 als de dealer blackjack heeft.":"";
+  save()}
+
+const euro=n=>(n<0?"−€":"€")+Math.abs(n);
+const pct=(a,b)=>b?Math.round(a/b*100)+"%":"–";
+function renderStats(){
+  const decided=ST.wins+ST.losses,signed=n=>n>0?"+"+euro(n):euro(n),cl=n=>n>0?"pos":n<0?"neg":"";
+  const tiles=[
+    ["Rondes",ST.rounds],["Handen",ST.hands,`${ST.wins} gewonnen · ${ST.losses} verloren · ${ST.pushes} push`],
+    ["Winstpercentage",pct(ST.wins,decided),"pushes niet meegeteld"],["Netto resultaat",signed(ST.net),"",cl(ST.net)],
+    ["Blackjacks",ST.bj],["Kapot gegaan",ST.busts,pct(ST.busts,ST.hands)+" van je handen"],
+    ["Beste ronde",signed(ST.bestRound),"",cl(ST.bestRound)],["Slechtste ronde",signed(ST.worstRound),"",cl(ST.worstRound)],
+    ["Hoogste saldo",euro(ST.peak)],["Langste winstreeks",ST.bestStreak,`nu ${ST.streak} op rij`],
+    ["Verdubbeld",ST.doubles,`${ST.doubleWins} keer gewonnen`],["Gesplitst",ST.splits],
+    ["Sidebets geraakt",`${ST.sideWins}/${ST.sideBets}`,`+${euro(ST.sideWon)} uitbetaald`],["Verzekering",`${ST.insWon}/${ST.insTaken}`,"keer uitbetaald"],
+    ["Juiste keuzes",pct(ST.correct,ST.decisions),`${ST.correct}/${ST.decisions} volgens basisstrategie`],["Hints gebruikt",ST.hints],
+    ["Opgegeven",ST.surrenders],
+    ["Waarschuwingen genegeerd",ST.ignored]];
+  $("chart").innerHTML=chartSVG();
+  $("stats").innerHTML=tiles.map(([l,v,sub,c])=>`<div class="stat"><span>${l}</span><b class="${c||""}">${v}</b>${sub?`<small>${sub}</small>`:""}</div>`).join("");
+  $("statsSum").textContent=ST.rounds?`Statistieken · ${ST.rounds} rondes · ${pct(ST.wins,decided)} gewonnen · ${signed(ST.net)}`:"Statistieken";
+}
+function chartSVG(){
+  const h=ST.hist;if(h.length<2)return`<p class="empty">Speel een paar rondes om het verloop van je saldo te zien.</p>`;
+  const W=420,H=150,pl=52,pr=10,pt=12,pb=24;let lo=Math.min(...h),hi=Math.max(...h);if(lo===hi){lo-=10;hi+=10}
+  const x=i=>pl+(W-pl-pr)*i/(h.length-1),y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
+  const pts=h.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" "),b=h[0],end=h[h.length-1];
+  return`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Saldo per ronde, van ${euro(b)} naar ${euro(end)}">
+    <line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(hi)}" y2="${y(hi)}"/><line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(lo)}" y2="${y(lo)}"/>
+    ${b>lo&&b<hi?`<line class="base" x1="${pl}" x2="${W-pr}" y1="${y(b)}" y2="${y(b)}"/>`:""}
+    <polygon class="area" points="${x(0)},${y(lo)} ${pts} ${x(h.length-1)},${y(lo)}"/>
+    <polyline class="line" points="${pts}"/>
+    <circle class="dot" cx="${x(h.length-1)}" cy="${y(end)}" r="4"/>
+    <text x="${pl-6}" y="${y(hi)+4}" text-anchor="end">${euro(hi)}</text><text x="${pl-6}" y="${y(lo)+4}" text-anchor="end">${euro(lo)}</text>
+    <text x="${pl}" y="${H-6}">start</text><text x="${W-pr}" y="${H-6}" text-anchor="end">nu: ${euro(end)}</text></svg>`}
+const LET={H:"K",S:"P",D:"V",X:"Vp",P:"Sp",R:"O"};
+function tableHTML(title,id,keys,label,data,hl){
+  const on=hl&&hl.tbl===id;
+  return`<div><h3>${title}</h3><div class="tw"><table><thead><tr><th></th>${COLS.map((c,i)=>`<th class="${on&&hl.col===i?"hl":""}">${c}</th>`).join("")}</tr></thead><tbody>
+  ${keys.map(k=>`<tr><th class="${on&&hl.key===k?"hl":""}">${label(k)}</th>${[...data[k]].map((ch,i)=>`<td class="k${ch}${on&&hl.key===k&&hl.col===i?" cur":""}">${LET[ch]}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`}
+function renderExtras(){
+  const hb=S.hint&&(S.phase==="play"||S.phase==="ins")&&!S.pending;$("hintBox").hidden=!hb;if(hb)$("hintText").textContent=S.hint;
+  $("showTable").hidden=S.phase!=="play";
+  const hl=S.phase==="play"&&S.cur?advise(S.seats[S.cur.s],curHand()):null;
+  const rng=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i),{HARD,SOFT}=T(),r=R();
+  $("tables").innerHTML=tableHTML("Harde handen","hard",rng(8,18),k=>k===8?"5–8":k===18?"18+":k,HARD,hl)
+    +tableHTML("Zachte handen (met aas)","soft",rng(13,20),k=>`A,${k-11}`,SOFT,hl)
+    +tableHTML("Paren","pair",rng(2,11),k=>k===11?"A,A":`${k},${k}`,PAIRS,hl);
+  const dl=r.decks===1?"1 kaartspel":`${r.decks} kaartspellen`,dealer=r.h17?"dealer neemt een kaart op zacht 17":"dealer staat op 17";
+  $("ruleLine").textContent=`Blackjack ${r.bj===1.5?"3 : 2":"6 : 5"} · ${dealer[0].toUpperCase()+dealer.slice(1)} · ${dl} · Verzekering 2 : 1 · Opgeven toegestaan`;
+  $("tableNote").textContent=`Basisstrategie voor deze tafel: ${dealer}, verdubbelen na splitsen mag, opgeven mag${r.dbl911?", verdubbelen alleen op 9 tot en met 11":""}.${r.decks<=2?" De tabel is gemaakt voor 4 of meer kaartspellen; met 1 of 2 wijkt het beste advies soms een klein beetje af.":""} De kolommen zijn de open kaart van de dealer. Tijdens je beurt is je situatie omlijnd.`;
+  const can=S.phase==="bet"||S.phase==="done";
+  [["rDecks",r.decks],["rH17",r.h17?1:0],["rBJ",r.bj],["rDbl",r.dbl911?1:0]].forEach(([id,v])=>{$(id).value=String(v);$(id).disabled=!can})}
+function setRule(key,v){if(!(S.phase==="bet"||S.phase==="done"))return render();
+  if(key==="decks"&&v!==R().decks)S.shoe=[];P.rules={...R(),[key]:v};render()}
+function again(){newRound();if(placeLast())deal();else render()}
+function save(){try{const b=S.phase==="bet"?S.bank+tableBets():S.phase==="done"?S.bank:S.startBank;localStorage.setItem("bj-bank",b);
+  localStorage.setItem("bj-stats",JSON.stringify(ST));localStorage.setItem("bj-prefs",JSON.stringify(P))}catch(e){}}
+function load(){try{const b=+localStorage.getItem("bj-bank");if(b>0){S.bank=b;S.startBank=b}
+  const st=JSON.parse(localStorage.getItem("bj-stats")||"null");if(st)ST=Object.assign(ST0(),st);
+  const p=JSON.parse(localStorage.getItem("bj-prefs")||"null");if(p){const rules={...P.rules,...(p.rules||{})};P=Object.assign(P,p);P.rules=rules}}catch(e){}}
+
+// ---------- bediening ----------
+$("seats").addEventListener("click",e=>{const b=e.target.closest("[data-spot]");if(b)return addBet(+b.dataset.seat,b.dataset.spot);
+  const x=e.target.closest("[data-clear]");if(x)clearSeat(+x.dataset.clear)});
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{S.chip=+c.dataset.v;render()});
+$("clearAll").onclick=()=>{clearAll();render()};
+$("rebet").onclick=()=>{placeLast();render()};
+$("deal").onclick=deal;
+$("insYes").onclick=()=>insDecide(true);$("insNo").onclick=()=>insDecide(false);
+$("hit").onclick=()=>act("hit");$("stand").onclick=()=>act("stand");$("double").onclick=()=>act("double");$("split").onclick=()=>act("split");
+$("warnGo").onclick=()=>confirmPending(true);$("warnCancel").onclick=()=>confirmPending(false);
+$("soundBtn").onclick=()=>{P.sound=!P.sound;render();sfx("chip")};
+$("tipsBtn").onclick=()=>{P.tips=!P.tips;if(!P.tips)S.pending=null;render()};
+let resetArmed=null;
+$("resetStats").onclick=()=>{const b=$("resetStats");
+  if(resetArmed){clearTimeout(resetArmed);resetArmed=null;ST=ST0();ST.peak=S.bank;b.textContent="Statistieken wissen";render();return}
+  b.textContent="Klik nogmaals om alles te wissen";resetArmed=setTimeout(()=>{resetArmed=null;b.textContent="Statistieken wissen"},3000)};
+$("newRound").onclick=()=>{newRound();render()};
+$("again").onclick=again;
+$("surrender").onclick=()=>act("surrender");$("hintBtn").onclick=showHint;
+$("showTable").onclick=()=>{$("tableBox").open=true;$("tableBox").scrollIntoView({behavior:"smooth",block:"start"})};
+$("rDecks").onchange=e=>setRule("decks",+e.target.value);
+$("rH17").onchange=e=>setRule("h17",e.target.value==="1");
+$("rBJ").onchange=e=>setRule("bj",+e.target.value);
+$("rDbl").onchange=e=>setRule("dbl911",e.target.value==="1");
+const KEYMAP={k:"hit",p:"stand",v:"double",s:"split",o:"surrender"};
+addEventListener("keydown",e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;
+  if(e.target.closest&&e.target.closest("input,textarea,select,summary"))return;
+  const k=e.key.toLowerCase();let ok=true;
+  const chip=["1","2","3","4"].indexOf(k);
+  if(S.pending){if(k==="escape"||k==="enter")confirmPending(false);else if(KEYMAP[k]===S.pending.name)confirmPending(true);else ok=false}
+  else if(S.phase==="play"){if(KEYMAP[k])act(KEYMAP[k]);else if(k==="?"||k==="i")showHint();else ok=false}
+  else if(S.phase==="ins"){if(k==="j"||k==="y")insDecide(true);else if(k==="n")insDecide(false);else if(k==="?"||k==="i")showHint();else ok=false}
+  else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="h"){placeLast();render()}else if(chip>=0){S.chip=[5,25,100,500][chip];render()}else ok=false}
+  else if(S.phase==="done"){if(k===" "||k==="enter")again();else if(k==="n"){newRound();render()}else if(chip>=0){S.chip=[5,25,100,500][chip];render()}else ok=false}
+  else ok=false;
+  if(ok)e.preventDefault()});
+
+function start(data){load();if(data&&data.S&&data.S.seats){S=Object.assign({},S_DEF,data.S);if(data.ST)ST=data.ST;if(data.P)P=data.P}render()}
+window.claude?.hot?.snapshot?.(()=>({S,ST,P}));
+window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
+</script>
+</body>
+</html>
