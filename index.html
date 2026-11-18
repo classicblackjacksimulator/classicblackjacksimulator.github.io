@@ -171,6 +171,7 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
       <button class="tool" id="langBtn" lang="en">English</button>
       <button class="tool" id="soundBtn" aria-pressed="true">Geluid aan</button>
       <button class="tool" id="tipsBtn" aria-pressed="true">Waarschuwingen aan</button>
+      <button class="tool" id="restartBtn">Opnieuw beginnen</button>
       <div class="bank"><span data-t="balance">Saldo</span> <b id="bank">€1000</b></div>
     </div>
   </header>
@@ -298,6 +299,8 @@ nl:{
   shuffled:"Nieuwe schoen geschud",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
   insLost:"Dealer heeft geen blackjack: verzekering verloren",insWin:(i,w)=>`Hand ${i}: verzekering +€${w}`,
   refill:"Saldo op: je krijgt €1000 erbij",
+  restart:"Opnieuw beginnen",restartConfirm:"Klik nogmaals: saldo wordt €1000",restartAria:"Opnieuw beginnen met €1000",
+  restarted:"Je begint opnieuw met €1000. Kies een fiche en klik op een inzetvak",
   pPerfect:"Perfecte pair",pColored:"Gekleurde pair",pMixed:"Gemengde pair",tSuitedTrips:"Drie gelijke, zelfde teken",
   tStraightFlush:"Straight flush",tTrips:"Drie gelijke",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
   rSurr:"Opgegeven",rBust:"Kapot",rPush:"Push",rDealerBJ:"Dealer BJ",rBJ:w=>`Blackjack +€${w}`,rWin:w=>`+€${w}`,rLose:"Verloren",
@@ -361,6 +364,8 @@ en:{
   shuffled:"New shoe shuffled",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
   insLost:"Dealer has no blackjack: insurance lost",insWin:(i,w)=>`Hand ${i}: insurance +€${w}`,
   refill:"Out of money: you get another €1000",
+  restart:"Start over",restartConfirm:"Click again: balance becomes €1000",restartAria:"Start over with €1000",
+  restarted:"You start over with €1000. Pick a chip and click a betting spot",
   pPerfect:"Perfect pair",pColored:"Coloured pair",pMixed:"Mixed pair",tSuitedTrips:"Suited three of a kind",
   tStraightFlush:"Straight flush",tTrips:"Three of a kind",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
   rSurr:"Surrendered",rBust:"Bust",rPush:"Push",rDealerBJ:"Dealer BJ",rBJ:w=>`Blackjack +€${w}`,rWin:w=>`+€${w}`,rLose:"Lost",
@@ -645,6 +650,7 @@ function render(){
   if(S.sfxEnd){sfx(S.sfxEnd,(newDelays.length?Math.max(...newDelays):0)+.35);S.sfxEnd=null}
   $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=t(P.sound?"soundOn":"soundOff");
   $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=t(P.tips?"warnOn":"warnOff");
+  $("restartBtn").textContent=t(restartArmed?"restartConfirm":"restart");$("restartBtn").setAttribute("aria-label",restartArmed?t("restartConfirm"):t("restartAria"));
   $("warnCtl").hidden=!S.pending;if(S.pending)$("warnText").textContent=S.pending.m?tm(S.pending.m):S.pending.text||"";
   renderStats();renderExtras();
   $("bank").textContent="€"+S.bank;
@@ -704,14 +710,29 @@ function renderExtras(){
 function setRule(key,v){if(!(S.phase==="bet"||S.phase==="done"))return render();
   if(key==="decks"&&v!==R().decks)S.shoe=[];P.rules={...R(),[key]:v};render()}
 function again(){if(S.phase!=="done")return;newRound();if(placeLast())deal();else render()}
+// De hele spelstand (ook een ronde die nog bezig is) wordt na elke actie bewaard, zodat je verder speelt na het sluiten van het tabblad.
 function save(){try{const b=S.phase==="bet"?S.bank+tableBets():S.phase==="done"?S.bank:S.startBank;localStorage.setItem("bj-bank",b);
+  localStorage.setItem("bj-state",JSON.stringify({...S,sfxEnd:null}));
   localStorage.setItem("bj-stats",JSON.stringify(ST));localStorage.setItem("bj-prefs",JSON.stringify(P))}catch(e){}}
-function load(){try{const b=+localStorage.getItem("bj-bank");if(b>0){S.bank=b;S.startBank=b}
+function validState(x){return x&&typeof x.bank==="number"&&Array.isArray(x.seats)&&x.seats.length===3&&["bet","ins","play","done"].includes(x.phase)
+  &&(x.phase!=="play"||(x.cur&&x.seats[x.cur.s]&&x.seats[x.cur.s].hands[x.cur.h]))&&(x.phase!=="ins"||(x.insSeat!=null&&x.seats[x.insSeat]))}
+function markSeen(){const hide=S.phase==="ins"||S.phase==="play";
+  S.dealer.forEach((c,i)=>seen.add((hide&&i===1?"b":"f")+c.u));S.seats.forEach(s=>s.hands.forEach(h=>h.cards.forEach(c=>seen.add("f"+c.u))))}
+function load(){try{const sv=JSON.parse(localStorage.getItem("bj-state")||"null");
+  if(validState(sv)){S=Object.assign({},S_DEF,sv,{sfxEnd:null});markSeen()}
+  else{const b=+localStorage.getItem("bj-bank");if(b>0){S.bank=b;S.startBank=b}}
   const st=JSON.parse(localStorage.getItem("bj-stats")||"null");if(st)ST=Object.assign(ST0(),st);
   const p=JSON.parse(localStorage.getItem("bj-prefs")||"null");if(p){const rules={...P.rules,...(p.rules||{})};P=Object.assign(P,p);P.rules=rules}}catch(e){}}
 
 // ---------- bediening ----------
-let resetArmed=null;
+let resetArmed=null,restartArmed=null;
+function restart(){const chip=S.chip,last=S.last;
+  S={bank:1000,phase:"bet",chip,shoe:[],uid:S.uid,dealer:[],seats:[mkSeat(),mkSeat(),mkSeat()],cur:null,insSeat:null,
+    msg:{k:"restarted"},cls:"",notes:[],last,startBank:1000,pending:null,sfxEnd:null};
+  seen.clear();if(ST.hist.length)ST.hist.push(1000);ST.peak=Math.max(ST.peak,1000);sfx("chip")}
+$("restartBtn").onclick=()=>{
+  if(restartArmed){clearTimeout(restartArmed);restartArmed=null;restart();render();return}
+  restartArmed=setTimeout(()=>{restartArmed=null;render()},3000);render()};
 $("seats").addEventListener("click",e=>{const b=e.target.closest("[data-spot]");if(b)return addBet(+b.dataset.seat,b.dataset.spot);
   const x=e.target.closest("[data-clear]");if(x)clearSeat(+x.dataset.clear)});
 document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{S.chip=+c.dataset.v;render()});
@@ -747,6 +768,8 @@ addEventListener("keydown",e=>{
   else ok=false;
   if(ok)e.preventDefault()});
 
+addEventListener("pagehide",save);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save()});
 function start(data){load();if(data&&data.S&&data.S.seats){S=Object.assign({},S_DEF,data.S);if(data.ST)ST=data.ST;if(data.P)P=data.P}render()}
 window.claude?.hot?.snapshot?.(()=>({S,ST,P}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
