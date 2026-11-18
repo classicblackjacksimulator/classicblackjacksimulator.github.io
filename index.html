@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="google-site-verification" content="Q3YLzPQI9KWO7PiS0FGFo3ctwrVbszr281st6EQaRvA" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Classic Blackjack Simulator | Gratis blackjack spelen met speelgeld</title>
-<meta name="description" content="Speel gratis blackjack in je browser met speelgeld. Tot drie handen tegelijk, splitsen, verdubbelen, verzekering, opgeven, sidebets (Pair, Dealer pair, 21+3), hints en een strategietabel.">
+<title>Classic Blackjack Simulator | Free blackjack with play money</title>
+<meta name="description" content="Play free blackjack in your browser with play money. Up to three hands at once, split, double down, insurance, surrender, side bets (Pair, Dealer pair, 21+3), a strategy chart, statistics and achievements. Also available in Dutch.">
 <link rel="canonical" href="https://classicblackjacksimulator.github.io/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Classic Blackjack Simulator">
-<meta property="og:description" content="Gratis blackjack in je browser, met speelgeld. Oefen basisstrategie met hints en een strategietabel.">
+<meta property="og:description" content="Free blackjack in your browser with play money. Practise basic strategy with a strategy chart, side bets and achievements.">
 <meta property="og:url" content="https://classicblackjacksimulator.github.io/">
 <meta name="theme-color" content="#08201f">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -567,7 +567,7 @@ en:{
     <p>Practise basic strategy with the strategy chart, set your own house rules and track your results in the statistics. The game is available in English and Dutch.</p>
     <p><strong>You play with play money.</strong> No real money is wagered or paid out, and there is nothing to buy or win.</p>`
 }};
-const L=()=>P.lang||((navigator.language||"").toLowerCase().startsWith("nl")?"nl":"en");
+const L=()=>P.lang||"en";
 function t(k,...a){const v=D[L()][k]!==undefined?D[L()][k]:D.nl[k];return typeof v==="function"?v(...a):v}
 const tm=m=>!m?"":typeof m==="string"?m:t(m.k,...(m.a||[]));
 const rk=c=>L()==="en"?({B:"J",V:"Q",H:"K"}[c.r]||c.r):c.r;
