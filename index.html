@@ -168,14 +168,16 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
   <header>
     <h1><span class="k">Classic</span> Black<span>jack</span> <span class="k">Simulator</span></h1>
     <div class="tools">
-      <button class="tool" id="soundBtn" aria-pressed="true">Geluid</button>
-      <button class="tool" id="tipsBtn" aria-pressed="true">Waarschuwingen</button>      <div class="bank">Saldo <b id="bank">€1000</b></div>
+      <button class="tool" id="langBtn" lang="en">English</button>
+      <button class="tool" id="soundBtn" aria-pressed="true">Geluid aan</button>
+      <button class="tool" id="tipsBtn" aria-pressed="true">Waarschuwingen aan</button>
+      <div class="bank"><span data-t="balance">Saldo</span> <b id="bank">€1000</b></div>
     </div>
   </header>
-  <div class="rule" id="ruleLine">Blackjack 3 : 2 · Dealer staat op 17 · Verzekering 2 : 1 · Opgeven toegestaan</div>
+  <div class="rule" id="ruleLine">Blackjack 3 : 2 · Dealer staat op 17 · 6 kaartspellen · Verzekering 2 : 1 · Opgeven toegestaan</div>
 
   <section class="dealer">
-    <div class="dealer-head"><h2 class="lbl-h">Dealer</h2><span class="score" id="dscore">–</span></div>
+    <div class="dealer-head"><h2 class="lbl-h" data-t="dealer">Dealer</h2><span class="score" id="dscore">–</span></div>
     <div class="cards" id="dealer"></div>
   </section>
 
@@ -192,31 +194,30 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
       <button class="chip" data-v="500" id="c500">500</button>
     </div>
     <div class="row" id="betCtl">
-      <button class="btn ghost" id="clearAll">Wis alles</button>
-      <button class="btn ghost" id="rebet">Herhaal inzet<kbd>H</kbd></button>
-      <button class="btn primary" id="deal">Delen<kbd>spatie</kbd></button>
+      <button class="btn ghost" id="clearAll" data-t="clearAll">Wis alles</button>
+      <button class="btn ghost" id="rebet" data-t="rebet" data-k="5">Herhaal inzet</button>
+      <button class="btn primary" id="deal" data-t="deal" data-k="@kSpace">Delen</button>
     </div>
     <div class="row" id="insCtl" hidden>
       <button class="btn primary" id="insYes">Verzekeren</button>
-      <button class="btn" id="insNo">Geen verzekering<kbd>N</kbd></button>
+      <button class="btn" id="insNo" data-t="insNo" data-k="2">Geen verzekering</button>
     </div>
-    <div class="hintbox" id="hintBox" hidden><b>Advies:</b> <span id="hintText"></span> <button class="x" id="showTable">bekijk in tabel</button></div>
     <div class="row" id="playCtl" hidden>
-      <button class="btn" id="hit">Kaart<kbd>K</kbd></button>
-      <button class="btn" id="stand">Pas<kbd>P</kbd></button>
-      <button class="btn" id="double">Verdubbel<kbd>V</kbd></button>
-      <button class="btn" id="split">Splits<kbd>S</kbd></button>
-      <button class="btn" id="surrender">Opgeven<kbd>O</kbd></button>
-      <button class="btn ghost" id="hintBtn">Hint<kbd>?</kbd></button>
+      <button class="btn" id="hit" data-t="hit" data-k="1">Kaart</button>
+      <button class="btn" id="stand" data-t="stand" data-k="2">Pas</button>
+      <button class="btn" id="double" data-t="double" data-k="3">Verdubbel</button>
+      <button class="btn" id="split" data-t="split" data-k="4">Splits</button>
+      <button class="btn" id="surrender" data-t="surrender" data-k="5">Opgeven</button>
     </div>
     <div class="warn" id="warnCtl" hidden>
-      <p><b>Let op:</b> <span id="warnText"></span></p>
-      <div class="row"><button class="btn primary" id="warnCancel">Toch niet</button><button class="btn ghost" id="warnGo">Toch doen</button></div>
+      <p><b data-t="careful">Let op:</b> <span id="warnText"></span></p>
+      <div class="row"><button class="btn primary" id="warnCancel" data-t="warnCancel" data-k="1">Toch niet</button><button class="btn ghost" id="warnGo" data-t="warnGo" data-k="2">Toch doen</button></div>
     </div>
     <div class="row" id="doneCtl" hidden>
-      <button class="btn ghost" id="newRound">Nieuwe inzet<kbd>N</kbd></button>
-      <button class="btn primary" id="again">Zelfde inzet &amp; delen<kbd>spatie</kbd></button>
-    </div>    <div class="hint" id="hint"></div>
+      <button class="btn ghost" id="newRound" data-t="newRound" data-k="1">Nieuwe inzet</button>
+      <button class="btn primary" id="again" data-t="again" data-k="2">Zelfde inzet &amp; delen</button>
+    </div>
+    <div class="hint" id="hint"></div>
   </div>
 
   <details id="statsBox">
@@ -227,78 +228,197 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
   </details>
 
   <details id="rulesBox">
-    <summary>Huisregels</summary>
+    <summary data-t="rulesTitle">Huisregels</summary>
     <div class="rules">
-      <label for="rDecks">Aantal kaartspellen<select id="rDecks"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
-      <label for="rH17">Dealer bij zacht 17<select id="rH17"><option value="0">Past</option><option value="1">Neemt een kaart</option></select></label>
-      <label for="rBJ">Blackjack betaalt<select id="rBJ"><option value="1.5">3 : 2</option><option value="1.2">6 : 5</option></select></label>
-      <label for="rDbl">Verdubbelen<select id="rDbl"><option value="0">Op elke twee kaarten</option><option value="1">Alleen op 9, 10 of 11</option></select></label>
+      <label for="rDecks"><span data-t="rDecks">Aantal kaartspellen</span><select id="rDecks"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
+      <label for="rH17"><span data-t="rH17">Dealer bij zacht 17</span><select id="rH17"><option value="0" data-t="optStand">Past</option><option value="1" data-t="optHit">Neemt een kaart</option></select></label>
+      <label for="rBJ"><span data-t="rBJ">Blackjack betaalt</span><select id="rBJ"><option value="1.5">3 : 2</option><option value="1.2">6 : 5</option></select></label>
+      <label for="rDbl"><span data-t="rDbl">Verdubbelen</span><select id="rDbl"><option value="0" data-t="optAny">Op elke twee kaarten</option><option value="1" data-t="opt911">Alleen op 9, 10 of 11</option></select></label>
     </div>
-    <p class="tnote">Je past de regels aan tussen rondes. Bij een ander aantal kaartspellen wordt de schoen opnieuw geschud.</p>
+    <p class="tnote" data-t="rulesNote">Je past de regels aan tussen rondes. Bij een ander aantal kaartspellen wordt de schoen opnieuw geschud.</p>
   </details>
 
   <details id="tableBox">
-    <summary>Strategietabel</summary>
+    <summary data-t="tableTitle">Strategietabel</summary>
     <p class="tnote" id="tableNote"></p>
     <div class="tables" id="tables"></div>
-    <div class="legend">
-      <span><i class="kH">K</i>Kaart</span><span><i class="kS">P</i>Pas</span><span><i class="kD">V</i>Verdubbel, anders kaart</span>
-      <span><i class="kX">Vp</i>Verdubbel, anders pas</span><span><i class="kP">Sp</i>Splits</span><span><i class="kR">O</i>Opgeven, anders kaart</span>
-    </div>
+    <div class="legend" id="legend"></div>
   </details>
 
   <details>
-    <summary>Uitbetalingen sidebets</summary>
-    <div class="pay">
-      <div><h3>Pair</h3><table>
-        <tr><td>Perfecte pair (zelfde kleur en teken)</td><td>25 : 1</td></tr>
-        <tr><td>Gekleurde pair (zelfde kleur)</td><td>12 : 1</td></tr>
-        <tr><td>Gemengde pair</td><td>6 : 1</td></tr></table></div>
-      <div><h3>21+3</h3><table>
-        <tr><td>Drie gelijke, zelfde teken</td><td>100 : 1</td></tr>
-        <tr><td>Straight flush</td><td>40 : 1</td></tr>
-        <tr><td>Drie gelijke</td><td>30 : 1</td></tr>
-        <tr><td>Straight</td><td>10 : 1</td></tr>
-        <tr><td>Flush</td><td>5 : 1</td></tr></table></div>
-      <div><h3>Dealer pair</h3><table>
-        <tr><td>Eerste twee dealerkaarten een paar</td><td>11 : 1</td></tr></table>
-        <p style="margin:6px 0 0">Pair en 21+3 worden direct na het delen afgerekend, dealer pair aan het eind van de ronde. Sidebets kan alleen met een hoofdinzet op die box.</p></div>
-    </div>
+    <summary data-t="payTitle">Uitbetalingen sidebets</summary>
+    <div class="pay" id="pay"></div>
   </details>
 
-  <footer class="site-foot">
+  <footer class="site-foot" id="siteFoot">
     <h2>Over Classic Blackjack Simulator</h2>
     <p>Speel gratis blackjack in je browser, zonder downloaden of account. Speel op maximaal drie handen tegelijk tegen de dealer, met splitsen, verdubbelen, verzekering en opgeven, plus de sidebets Pair, Dealer pair en 21+3.</p>
-    <p>Oefen de basisstrategie met de hint-knop en de strategietabel, kies je eigen huisregels en volg je resultaten in de statistieken.</p>
+    <p>Oefen de basisstrategie met de strategietabel, kies je eigen huisregels en volg je resultaten in de statistieken. Het spel is in het Nederlands en het Engels te spelen.</p>
     <p><strong>Je speelt met speelgeld.</strong> Er wordt geen echt geld ingezet of uitbetaald, en je kunt niets kopen of winnen.</p>
   </footer>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const SUITS=[["♠",0],["♥",1],["♦",1],["♣",0]];
-const RANKS=["A","2","3","4","5","6","7","8","9","10","B","V","H"]; // Boer, Vrouw, Heer
+const RANKS=["A","2","3","4","5","6","7","8","9","10","B","V","H"]; // intern: Boer, Vrouw, Heer
 const SPOTS=["bet","pair","t213","dp"];
 const mkSeat=()=>({bet:0,pair:0,t213:0,dp:0,ins:0,hands:[],res:{}});
 let S={bank:1000,phase:"bet",chip:25,shoe:[],uid:0,dealer:[],seats:[mkSeat(),mkSeat(),mkSeat()],cur:null,insSeat:null,
-  msg:"Kies een fiche en klik op een inzetvak",cls:"",notes:[],last:null,startBank:1000,pending:null,sfxEnd:null,hint:null};
-const S_DEF={pending:null,sfxEnd:null,hint:null};
-let P={sound:true,tips:true,rules:{decks:6,h17:false,bj:1.5,dbl911:false}};
+  msg:{k:"pickChip"},cls:"",notes:[],last:null,startBank:1000,pending:null,sfxEnd:null};
+const S_DEF={pending:null,sfxEnd:null};
+let P={sound:true,tips:true,lang:null,rules:{decks:6,h17:false,bj:1.5,dbl911:false}};
 const R=()=>P.rules;
 const ST0=()=>({decisions:0,correct:0,hints:0,surrenders:0,hist:[],rounds:0,hands:0,wins:0,losses:0,pushes:0,bj:0,busts:0,doubles:0,doubleWins:0,splits:0,sideBets:0,sideWins:0,sideWon:0,insTaken:0,insWon:0,net:0,bestRound:0,worstRound:0,peak:1000,streak:0,bestStreak:0,ignored:0});
 let ST=ST0();
+
+// ---------- talen ----------
+const euro=n=>(n<0?"−€":"€")+Math.abs(n);
+const signed=n=>n>0?"+"+euro(n):euro(n);
+const D={
+nl:{
+  docTitle:"Classic Blackjack Simulator | Gratis blackjack spelen met speelgeld",
+  balance:"Saldo",soundOn:"Geluid aan",soundOff:"Geluid uit",warnOn:"Waarschuwingen aan",warnOff:"Waarschuwingen uit",
+  langBtn:"English",langAria:"Switch to English",
+  clearAll:"Wis alles",rebet:"Herhaal inzet",deal:"Delen",kSpace:"spatie",
+  insYes:(i,a)=>`Verzekeren hand ${i} (€${a})`,insNo:"Geen verzekering",
+  hit:"Kaart",stand:"Pas",double:"Verdubbel",split:"Splits",surrender:"Opgeven",
+  careful:"Let op:",warnCancel:"Toch niet",warnGo:"Toch doen",
+  newRound:"Nieuwe inzet",again:"Zelfde inzet & delen",
+  betHint:"Speel op één, twee of drie handen. Klik een vak om het gekozen fiche in te zetten. Toetsen: 1 tot 4 kiest een fiche, 5 herhaalt je inzet, spatie deelt.",
+  insHint:"Verzekering kost de helft van je inzet en betaalt 2 : 1 als de dealer blackjack heeft.",
+  dealer:"Dealer",hand:i=>`Hand ${i}`,clear:"wis",insTag:a=>`Verz. €${a}`,
+  mainAria:i=>`Hoofdinzet hand ${i}`,sideAria:(l,i)=>`${l} inzet hand ${i}`,hiddenCard:"Verborgen kaart",
+  pickChip:"Kies een fiche en klik op een inzetvak",needMain:i=>`Zet eerst een hoofdinzet op hand ${i}`,
+  noFunds:"Niet genoeg saldo voor dit fiche",ready:"Klaar? Klik op Delen",noFundsRebet:"Niet genoeg saldo voor dezelfde inzet",
+  dealerAce:"De dealer toont een aas",
+  turn:(i,j,n,sc)=>`Hand ${i}${n>1?` (deel ${j}/${n})`:""}: ${sc}`,
+  result:(dbj,dbust,net)=>(dbj?"Dealer heeft blackjack. ":dbust?"Dealer kapot! ":"")+(net>0?`Ronde: +€${net}`:net<0?`Ronde: −€${-net}`:"Ronde: gelijk"),
+  shuffled:"Nieuwe schoen geschud",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
+  insLost:"Dealer heeft geen blackjack: verzekering verloren",insWin:(i,w)=>`Hand ${i}: verzekering +€${w}`,
+  refill:"Saldo op: je krijgt €1000 erbij",
+  pPerfect:"Perfecte pair",pColored:"Gekleurde pair",pMixed:"Gemengde pair",tSuitedTrips:"Drie gelijke, zelfde teken",
+  tStraightFlush:"Straight flush",tTrips:"Drie gelijke",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
+  rSurr:"Opgegeven",rBust:"Kapot",rPush:"Push",rDealerBJ:"Dealer BJ",rBJ:w=>`Blackjack +€${w}`,rWin:w=>`+€${w}`,rLose:"Verloren",
+  mSurr:(v,soft)=>`met ${soft?"zacht ":""}${v} heb je nog prima kansen. Opgeven kost je direct de helft van je inzet.`,
+  mHit:v=>`je hebt ${v}. Met nog een kaart ga je ${v>=19?"vrijwel zeker":"waarschijnlijk"} kapot.`,
+  mStandLow:v=>`je hebt pas ${v}. Met een extra kaart kun je nooit kapot gaan.`,
+  mStandSoft:v=>`je hebt zacht ${v} (${v-10}/${v}). Je aas kan als 1 tellen, dus een extra kaart kan je niet kapot maken.`,
+  mDbl20:v=>`je hebt al ${v}. Verdubbelen geeft je nog maar één kaart en maakt een sterke hand alleen slechter.`,
+  mDblHard:v=>`met ${v} verdubbel je je inzet terwijl de extra kaart je waarschijnlijk kapot maakt.`,
+  mSplit10:()=>"twee tienen zijn samen 20, een van de sterkste handen. Splitsen gooit dat weg.",
+  mSplit5:()=>"twee vijven zijn samen 10, ideaal om op te verdubbelen. Gesplitst heb je twee zwakke handen.",
+  ruleLine:r=>`Blackjack ${r.bj===1.5?"3 : 2":"6 : 5"} · ${r.h17?"Dealer neemt een kaart op zacht 17":"Dealer staat op 17"} · ${r.decks===1?"1 kaartspel":r.decks+" kaartspellen"} · Verzekering 2 : 1 · Opgeven toegestaan`,
+  tableNote:r=>`Basisstrategie voor deze tafel: ${r.h17?"dealer neemt een kaart op zacht 17":"dealer staat op 17"}, verdubbelen na splitsen mag, opgeven mag${r.dbl911?", verdubbelen alleen op 9 tot en met 11":""}.${r.decks<=2?" De tabel is gemaakt voor 4 of meer kaartspellen; met 1 of 2 wijkt het beste advies soms een klein beetje af.":""} De kolommen zijn de open kaart van de dealer. Tijdens je beurt is je situatie omlijnd.`,
+  tHard:"Harde handen",tSoft:"Zachte handen (met aas)",tPairs:"Paren",
+  letters:{H:"K",S:"P",D:"V",X:"Vp",P:"Sp",R:"O"},
+  legend:{H:"Kaart",S:"Pas",D:"Verdubbel, anders kaart",X:"Verdubbel, anders pas",P:"Splits",R:"Opgeven, anders kaart"},
+  statsTitle:"Statistieken",statsSum:(r,p,n)=>`Statistieken · ${r} rondes · ${p} gewonnen · ${n}`,
+  reset:"Statistieken wissen",resetConfirm:"Klik nogmaals om alles te wissen",
+  chartEmpty:"Speel een paar rondes om het verloop van je saldo te zien.",chartStart:"start",chartNow:"nu",
+  chartAria:(a,b)=>`Saldo per ronde, van ${a} naar ${b}`,
+  tiles:x=>[["Rondes",x.rounds],["Handen",x.hands,`${x.wins} gewonnen · ${x.losses} verloren · ${x.pushes} push`],
+    ["Winstpercentage",x.winPct,"pushes niet meegeteld"],["Netto resultaat",signed(x.net),"",x.netCls],
+    ["Blackjacks",x.bj],["Kapot gegaan",x.busts,`${x.bustPct} van je handen`],
+    ["Beste ronde",signed(x.bestRound),"",x.bestCls],["Slechtste ronde",signed(x.worstRound),"",x.worstCls],
+    ["Hoogste saldo",euro(x.peak)],["Langste winstreeks",x.bestStreak,`nu ${x.streak} op rij`],
+    ["Verdubbeld",x.doubles,`${x.doubleWins} keer gewonnen`],["Gesplitst",x.splits],
+    ["Sidebets geraakt",`${x.sideWins}/${x.sideBets}`,`+${euro(x.sideWon)} uitbetaald`],["Verzekering",`${x.insWon}/${x.insTaken}`,"keer uitbetaald"],
+    ["Juiste keuzes",x.correctPct,`${x.correct}/${x.decisions} volgens basisstrategie`],["Opgegeven",x.surrenders],
+    ["Waarschuwingen genegeerd",x.ignored]],
+  rulesTitle:"Huisregels",rDecks:"Aantal kaartspellen",rH17:"Dealer bij zacht 17",rBJ:"Blackjack betaalt",rDbl:"Verdubbelen",
+  optStand:"Past",optHit:"Neemt een kaart",optAny:"Op elke twee kaarten",opt911:"Alleen op 9, 10 of 11",
+  rulesNote:"Je past de regels aan tussen rondes. Bij een ander aantal kaartspellen wordt de schoen opnieuw geschud.",
+  tableTitle:"Strategietabel",payTitle:"Uitbetalingen sidebets",
+  pay:[["Pair",[["Perfecte pair (zelfde kleur en teken)","25 : 1"],["Gekleurde pair (zelfde kleur)","12 : 1"],["Gemengde pair","6 : 1"]]],
+    ["21+3",[["Drie gelijke, zelfde teken","100 : 1"],["Straight flush","40 : 1"],["Drie gelijke","30 : 1"],["Straight","10 : 1"],["Flush","5 : 1"]]],
+    ["Dealer pair",[["Eerste twee dealerkaarten een paar","11 : 1"]]]],
+  payNote:"Pair en 21+3 worden direct na het delen afgerekend, dealer pair aan het eind van de ronde. Een sidebet kan alleen met een hoofdinzet op die hand.",
+  foot:`<h2>Over Classic Blackjack Simulator</h2>
+    <p>Speel gratis blackjack in je browser, zonder downloaden of account. Speel op maximaal drie handen tegelijk tegen de dealer, met splitsen, verdubbelen, verzekering en opgeven, plus de sidebets Pair, Dealer pair en 21+3.</p>
+    <p>Oefen de basisstrategie met de strategietabel, kies je eigen huisregels en volg je resultaten in de statistieken. Het spel is in het Nederlands en het Engels te spelen.</p>
+    <p><strong>Je speelt met speelgeld.</strong> Er wordt geen echt geld ingezet of uitbetaald, en je kunt niets kopen of winnen.</p>`
+},
+en:{
+  docTitle:"Classic Blackjack Simulator | Free blackjack with play money",
+  balance:"Balance",soundOn:"Sound on",soundOff:"Sound off",warnOn:"Warnings on",warnOff:"Warnings off",
+  langBtn:"Nederlands",langAria:"Wissel naar Nederlands",
+  clearAll:"Clear all",rebet:"Repeat bet",deal:"Deal",kSpace:"space",
+  insYes:(i,a)=>`Insure hand ${i} (€${a})`,insNo:"No insurance",
+  hit:"Hit",stand:"Stand",double:"Double",split:"Split",surrender:"Surrender",
+  careful:"Careful:",warnCancel:"Never mind",warnGo:"Do it anyway",
+  newRound:"New bet",again:"Same bet & deal",
+  betHint:"Play one, two or three hands. Click a spot to place the selected chip. Keys: 1 to 4 picks a chip, 5 repeats your bet, space deals.",
+  insHint:"Insurance costs half your bet and pays 2 : 1 if the dealer has blackjack.",
+  dealer:"Dealer",hand:i=>`Hand ${i}`,clear:"clear",insTag:a=>`Ins. €${a}`,
+  mainAria:i=>`Main bet hand ${i}`,sideAria:(l,i)=>`${l} bet hand ${i}`,hiddenCard:"Hidden card",
+  pickChip:"Pick a chip and click a betting spot",needMain:i=>`Place a main bet on hand ${i} first`,
+  noFunds:"Not enough balance for this chip",ready:"Ready? Click Deal",noFundsRebet:"Not enough balance for the same bet",
+  dealerAce:"The dealer shows an ace",
+  turn:(i,j,n,sc)=>`Hand ${i}${n>1?` (split ${j}/${n})`:""}: ${sc}`,
+  result:(dbj,dbust,net)=>(dbj?"Dealer has blackjack. ":dbust?"Dealer busts! ":"")+(net>0?`Round: +€${net}`:net<0?`Round: −€${-net}`:"Round: even"),
+  shuffled:"New shoe shuffled",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
+  insLost:"Dealer has no blackjack: insurance lost",insWin:(i,w)=>`Hand ${i}: insurance +€${w}`,
+  refill:"Out of money: you get another €1000",
+  pPerfect:"Perfect pair",pColored:"Coloured pair",pMixed:"Mixed pair",tSuitedTrips:"Suited three of a kind",
+  tStraightFlush:"Straight flush",tTrips:"Three of a kind",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
+  rSurr:"Surrendered",rBust:"Bust",rPush:"Push",rDealerBJ:"Dealer BJ",rBJ:w=>`Blackjack +€${w}`,rWin:w=>`+€${w}`,rLose:"Lost",
+  mSurr:(v,soft)=>`with ${soft?"soft ":""}${v} you still have a good chance. Surrendering costs you half your bet right away.`,
+  mHit:v=>`you have ${v}. Another card will ${v>=19?"almost certainly":"probably"} bust you.`,
+  mStandLow:v=>`you only have ${v}. Another card can never bust you.`,
+  mStandSoft:v=>`you have soft ${v} (${v-10}/${v}). Your ace can count as 1, so another card cannot bust you.`,
+  mDbl20:v=>`you already have ${v}. Doubling gives you just one more card and can only make a strong hand worse.`,
+  mDblHard:v=>`with ${v} you double your bet while the extra card will probably bust you.`,
+  mSplit10:()=>"two tens make 20, one of the strongest hands. Splitting throws that away.",
+  mSplit5:()=>"two fives make 10, perfect for doubling. Split, you get two weak hands.",
+  ruleLine:r=>`Blackjack pays ${r.bj===1.5?"3 : 2":"6 : 5"} · ${r.h17?"Dealer hits soft 17":"Dealer stands on 17"} · ${r.decks===1?"1 deck":r.decks+" decks"} · Insurance 2 : 1 · Surrender allowed`,
+  tableNote:r=>`Basic strategy for this table: ${r.h17?"dealer hits soft 17":"dealer stands on 17"}, double after split allowed, surrender allowed${r.dbl911?", double on 9 to 11 only":""}.${r.decks<=2?" The chart is made for 4 or more decks; with 1 or 2 decks the best play is sometimes slightly different.":""} The columns are the dealer's up card. During your turn your situation is outlined.`,
+  tHard:"Hard hands",tSoft:"Soft hands (with an ace)",tPairs:"Pairs",
+  letters:{H:"H",S:"S",D:"D",X:"Ds",P:"P",R:"R"},
+  legend:{H:"Hit",S:"Stand",D:"Double, otherwise hit",X:"Double, otherwise stand",P:"Split",R:"Surrender, otherwise hit"},
+  statsTitle:"Statistics",statsSum:(r,p,n)=>`Statistics · ${r} rounds · ${p} won · ${n}`,
+  reset:"Reset statistics",resetConfirm:"Click again to erase everything",
+  chartEmpty:"Play a few rounds to see how your balance changes.",chartStart:"start",chartNow:"now",
+  chartAria:(a,b)=>`Balance per round, from ${a} to ${b}`,
+  tiles:x=>[["Rounds",x.rounds],["Hands",x.hands,`${x.wins} won · ${x.losses} lost · ${x.pushes} push`],
+    ["Win rate",x.winPct,"pushes not counted"],["Net result",signed(x.net),"",x.netCls],
+    ["Blackjacks",x.bj],["Busts",x.busts,`${x.bustPct} of your hands`],
+    ["Best round",signed(x.bestRound),"",x.bestCls],["Worst round",signed(x.worstRound),"",x.worstCls],
+    ["Highest balance",euro(x.peak)],["Longest win streak",x.bestStreak,`currently ${x.streak} in a row`],
+    ["Doubled",x.doubles,`won ${x.doubleWins} times`],["Split",x.splits],
+    ["Side bets hit",`${x.sideWins}/${x.sideBets}`,`+${euro(x.sideWon)} paid out`],["Insurance",`${x.insWon}/${x.insTaken}`,"times paid out"],
+    ["Correct decisions",x.correctPct,`${x.correct}/${x.decisions} by basic strategy`],["Surrendered",x.surrenders],
+    ["Warnings ignored",x.ignored]],
+  rulesTitle:"House rules",rDecks:"Number of decks",rH17:"Dealer on soft 17",rBJ:"Blackjack pays",rDbl:"Doubling",
+  optStand:"Stands",optHit:"Hits",optAny:"On any two cards",opt911:"Only on 9, 10 or 11",
+  rulesNote:"You can change the rules between rounds. Changing the number of decks reshuffles the shoe.",
+  tableTitle:"Strategy chart",payTitle:"Side bet payouts",
+  pay:[["Pair",[["Perfect pair (same colour and suit)","25 : 1"],["Coloured pair (same colour)","12 : 1"],["Mixed pair","6 : 1"]]],
+    ["21+3",[["Suited three of a kind","100 : 1"],["Straight flush","40 : 1"],["Three of a kind","30 : 1"],["Straight","10 : 1"],["Flush","5 : 1"]]],
+    ["Dealer pair",[["Dealer's first two cards are a pair","11 : 1"]]]],
+  payNote:"Pair and 21+3 are settled right after the deal, dealer pair at the end of the round. A side bet needs a main bet on that hand.",
+  foot:`<h2>About Classic Blackjack Simulator</h2>
+    <p>Play blackjack for free in your browser, no download or account needed. Play up to three hands at once against the dealer, with split, double down, insurance and surrender, plus the Pair, Dealer pair and 21+3 side bets.</p>
+    <p>Practise basic strategy with the strategy chart, set your own house rules and track your results in the statistics. The game is available in English and Dutch.</p>
+    <p><strong>You play with play money.</strong> No real money is wagered or paid out, and there is nothing to buy or win.</p>`
+}};
+const L=()=>P.lang||((navigator.language||"").toLowerCase().startsWith("nl")?"nl":"en");
+function t(k,...a){const v=D[L()][k]!==undefined?D[L()][k]:D.nl[k];return typeof v==="function"?v(...a):v}
+const tm=m=>!m?"":typeof m==="string"?m:t(m.k,...(m.a||[]));
+const rk=c=>L()==="en"?({B:"J",V:"Q",H:"K"}[c.r]||c.r):c.r;
 
 // ---------- geluid (WebAudio, alles gesynthetiseerd) ----------
 let AC=null,armed=false;
 addEventListener("pointerdown",()=>{armed=true;ac()},{capture:true});
 addEventListener("keydown",()=>{armed=true;ac()},{capture:true});
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){return null}}if(AC.state==="suspended")AC.resume();return AC}
-function env(g,t,vol,dur){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+dur)}
-function tone(f,dur,type,vol,when,f2){const a=ac();if(!a)return;const t=a.currentTime+(when||0),o=a.createOscillator(),g=a.createGain();
-  o.type=type||"sine";o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+dur);env(g,t,vol||.12,dur);o.connect(g).connect(a.destination);o.start(t);o.stop(t+dur+.05)}
-function noise(dur,vol,when,freq){const a=ac();if(!a)return;const t=a.currentTime+(when||0),n=Math.ceil(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
+function env(g,tt,vol,dur){g.gain.setValueAtTime(0,tt);g.gain.linearRampToValueAtTime(vol,tt+.008);g.gain.exponentialRampToValueAtTime(.0001,tt+dur)}
+function tone(f,dur,type,vol,when,f2){const a=ac();if(!a)return;const tt=a.currentTime+(when||0),o=a.createOscillator(),g=a.createGain();
+  o.type=type||"sine";o.frequency.setValueAtTime(f,tt);if(f2)o.frequency.exponentialRampToValueAtTime(f2,tt+dur);env(g,tt,vol||.12,dur);o.connect(g).connect(a.destination);o.start(tt);o.stop(tt+dur+.05)}
+function noise(dur,vol,when,freq){const a=ac();if(!a)return;const tt=a.currentTime+(when||0),n=Math.ceil(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);
   for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();
-  s.buffer=b;f.type="bandpass";f.frequency.value=freq||2500;f.Q.value=.8;env(g,t,vol,dur);s.connect(f).connect(g).connect(a.destination);s.start(t)}
+  s.buffer=b;f.type="bandpass";f.frequency.value=freq||2500;f.Q.value=.8;env(g,tt,vol,dur);s.connect(f).connect(g).connect(a.destination);s.start(tt)}
 const SFX={
   card:w=>noise(.07,.35,w,2800),
   chip:w=>{tone(2300,.05,"triangle",.07,w);tone(3200,.06,"triangle",.05,(w||0)+.035)},
@@ -315,29 +435,29 @@ function sfx(name,when){if(P.sound&&armed&&SFX[name])SFX[name](when||0)}
 function newShoe(){const d=[];for(let n=0;n<R().decks;n++)for(const[s,red]of SUITS)for(const r of RANKS)d.push({r,s,red});
   for(let i=d.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[d[i],d[j]]=[d[j],d[i]]}return d}
 function draw(){
-  if(S.shoe.length<Math.max(15,Math.round(R().decks*52*.2))){S.shoe=newShoe();if(S.uid)S.notes.push("Nieuwe schoen geschud")}
+  if(S.shoe.length<Math.max(15,Math.round(R().decks*52*.2))){S.shoe=newShoe();if(S.uid)S.notes.push({k:"shuffled"})}
   const c=S.shoe.pop();c.u=++S.uid;return c}
 const val=c=>c.r==="A"?11:isNaN(c.r)?10:+c.r;
 const ridx=c=>RANKS.indexOf(c.r)+1;
-function tot(cards){let t=0,a=0;for(const c of cards){t+=val(c);if(c.r==="A")a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
-const scoreText=cards=>{const{t,soft}=tot(cards);return soft&&t<21?`${t-10}/${t}`:`${t}`};
+function tot(cards){let v=0,a=0;for(const c of cards){v+=val(c);if(c.r==="A")a++}while(v>21&&a){v-=10;a--}return{t:v,soft:a>0}}
+const scoreText=cards=>{const{t:v,soft}=tot(cards);return soft&&v<21?`${v-10}/${v}`:`${v}`};
 const natural=h=>!h.split&&h.cards.length===2&&tot(h.cards).t===21;
 const tableBets=()=>S.seats.reduce((a,s)=>a+s.bet+s.pair+s.t213+s.dp,0);
 
 // ---------- sidebets ----------
-function pairRes(a,b){if(a.r!==b.r)return null;if(a.s===b.s)return{name:"Perfecte pair",mult:25};if(a.red===b.red)return{name:"Gekleurde pair",mult:12};return{name:"Gemengde pair",mult:6}}
+function pairRes(a,b){if(a.r!==b.r)return null;if(a.s===b.s)return{name:"pPerfect",mult:25};if(a.red===b.red)return{name:"pColored",mult:12};return{name:"pMixed",mult:6}}
 function t213Res(cs){
   const flush=cs.every(c=>c.s===cs[0].s),trips=cs.every(c=>c.r===cs[0].r);
   const v=cs.map(ridx).sort((x,y)=>x-y);
   const straight=(v[0]+1===v[1]&&v[1]+1===v[2])||(v[0]===1&&v[1]===12&&v[2]===13);
-  if(trips&&flush)return{name:"Drie gelijke, zelfde teken",mult:100};
-  if(straight&&flush)return{name:"Straight flush",mult:40};
-  if(trips)return{name:"Drie gelijke",mult:30};
-  if(straight)return{name:"Straight",mult:10};
-  if(flush)return{name:"Flush",mult:5};
+  if(trips&&flush)return{name:"tSuitedTrips",mult:100};
+  if(straight&&flush)return{name:"tStraightFlush",mult:40};
+  if(trips)return{name:"tTrips",mult:30};
+  if(straight)return{name:"tStraight",mult:10};
+  if(flush)return{name:"tFlush",mult:5};
   return null}
 function settleSide(s,i,key,r){const stake=s[key];if(!stake)return;ST.sideBets++;
-  if(r){const win=stake*r.mult;S.bank+=stake+win;s.res[key]={win};ST.sideWins++;ST.sideWon+=win;S.notes.push(`Box ${i+1}: ${r.name} +€${win}`)}
+  if(r){const win=stake*r.mult;S.bank+=stake+win;s.res[key]={win};ST.sideWins++;ST.sideWon+=win;S.notes.push({k:"sideWin",a:[i+1,r.name,win]})}
   else s.res[key]={win:0}}
 
 // ---------- inzetten ----------
@@ -345,42 +465,41 @@ function addBet(i,spot){
   if(S.phase==="done")newRound();
   if(S.phase!=="bet")return;
   const s=S.seats[i];
-  if(spot!=="bet"&&!s.bet){S.msg=`Zet eerst een hoofdinzet op box ${i+1}`;S.cls="";return render()}
-  if(S.chip>S.bank){S.msg="Niet genoeg saldo voor dit fiche";S.cls="lose";return render()}
-  s[spot]+=S.chip;S.bank-=S.chip;sfx("chip");S.msg="Klaar? Klik op Delen";S.cls="";render()}
+  if(spot!=="bet"&&!s.bet){S.msg={k:"needMain",a:[i+1]};S.cls="";return render()}
+  if(S.chip>S.bank){S.msg={k:"noFunds"};S.cls="lose";return render()}
+  s[spot]+=S.chip;S.bank-=S.chip;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
 function clearSeat(i){const s=S.seats[i];for(const k of SPOTS){S.bank+=s[k];s[k]=0}render()}
 function clearAll(){S.seats.forEach(s=>{for(const k of SPOTS){S.bank+=s[k];s[k]=0}})}
 function newRound(){S.phase="bet";S.dealer=[];S.cur=null;S.insSeat=null;S.notes=[];
   S.seats.forEach(s=>{s.hands=[];s.res={};s.ins=0;for(const k of SPOTS)s[k]=0});seen.clear();
-  S.msg="Kies een fiche en klik op een inzetvak";S.cls=""}
+  S.msg={k:"pickChip"};S.cls=""}
 function placeLast(){if(!S.last)return false;clearAll();
   const need=S.last.reduce((a,b)=>a+b.bet+b.pair+b.t213+b.dp,0);
-  if(need>S.bank){S.msg="Niet genoeg saldo voor dezelfde inzet";S.cls="lose";return false}
+  if(need>S.bank){S.msg={k:"noFundsRebet"};S.cls="lose";return false}
   S.last.forEach((b,i)=>{for(const k of SPOTS)S.seats[i][k]=b[k]});S.bank-=need;sfx("chip");return true}
 
 // ---------- ronde ----------
 function deal(){
-  if(!S.seats.some(s=>s.bet))return;
+  if(S.phase!=="bet"||!S.seats.some(s=>s.bet))return;
   S.last=S.seats.map(s=>({bet:s.bet,pair:s.pair,t213:s.t213,dp:s.dp}));
-  S.startBank=S.bank+tableBets();S.notes=[];S.dealer=[];S.hint=null;
+  S.startBank=S.bank+tableBets();S.notes=[];S.dealer=[];
   S.seats.forEach(s=>{s.res={};s.ins=0;s.hands=s.bet?[{cards:[],bet:s.bet,done:false,split:false}]:[]});
   for(let n=0;n<2;n++){S.seats.forEach(s=>{if(s.bet)s.hands[0].cards.push(draw())});S.dealer.push(draw())}
   S.seats.forEach((s,i)=>{if(!s.bet)return;const[a,b]=s.hands[0].cards;
     settleSide(s,i,"pair",pairRes(a,b));settleSide(s,i,"t213",t213Res([a,b,S.dealer[0]]))});
-  if(S.dealer[0].r==="A"){S.phase="ins";S.insSeat=nextInsSeat(-1);S.msg="De dealer toont een aas";S.cls="";return render()}
+  if(S.dealer[0].r==="A"){S.phase="ins";S.insSeat=nextInsSeat(-1);S.msg={k:"dealerAce"};S.cls="";return render()}
   afterIns()}
 function nextInsSeat(from){for(let i=from+1;i<3;i++)if(S.seats[i].bet)return i;return null}
-function insDecide(yes){const s=S.seats[S.insSeat];
-  ST.decisions++;S.hint=null;
-  if(yes){const a=Math.floor(s.bet/2);if(a<=S.bank){S.bank-=a;s.ins=a;ST.insTaken++;sfx("chip")}
-    S.notes.push(`Box ${S.insSeat+1}: verzekering, basisstrategie zegt geen verzekering`)}
+function insDecide(yes){if(S.phase!=="ins")return;const s=S.seats[S.insSeat];
+  ST.decisions++;
+  if(yes){const a=Math.floor(s.bet/2);if(a<=S.bank){S.bank-=a;s.ins=a;ST.insTaken++;sfx("chip")}}
   else ST.correct++;
   S.insSeat=nextInsSeat(S.insSeat);if(S.insSeat==null)afterIns();else render()}
 function afterIns(){
   S.insSeat=null;const up=S.dealer[0];
   if(up.r==="A"||val(up)===10){
     if(tot(S.dealer).t===21)return settle();
-    if(S.seats.some(s=>s.ins)){S.notes.push("Dealer heeft geen blackjack: verzekering verloren");S.seats.forEach(s=>{if(s.ins)s.res.ins={win:0}})}
+    if(S.seats.some(s=>s.ins)){S.notes.push({k:"insLost"});S.seats.forEach(s=>{if(s.ins)s.res.ins={win:0}})}
   }
   S.phase="play";
   S.seats.forEach(s=>s.hands.forEach(h=>{if(tot(h.cards).t===21)h.done=true}));
@@ -389,11 +508,11 @@ function findNext(){for(let i=0;i<3;i++){const hs=S.seats[i].hands;for(let j=0;j
 function curHand(){return S.seats[S.cur.s].hands[S.cur.h]}
 function next(){S.cur=findNext();if(!S.cur)return dealerPlay();
   const seat=S.seats[S.cur.s],h=curHand(),n=seat.hands.length;
-  S.msg=`Box ${S.cur.s+1}${n>1?` (hand ${S.cur.h+1}/${n})`:""}: ${scoreText(h.cards)}`;S.cls="";render()}
-const canDouble=h=>{if(h.cards.length!==2||h.splitAces||S.bank<h.bet)return false;if(!R().dbl911)return true;const t=tot(h.cards).t;return t>=9&&t<=11};
-const dealerHits=()=>{const{t,soft}=tot(S.dealer);return t<17||(R().h17&&t===17&&soft)};
+  S.msg={k:"turn",a:[S.cur.s+1,S.cur.h+1,n,scoreText(h.cards)]};S.cls="";render()}
+const canDouble=h=>{if(h.cards.length!==2||h.splitAces||S.bank<h.bet)return false;if(!R().dbl911)return true;const v=tot(h.cards).t;return v>=9&&v<=11};
+const dealerHits=()=>{const{t:v,soft}=tot(S.dealer);return v<17||(R().h17&&v===17&&soft)};
 const canSplit=(seat,h)=>h.cards.length===2&&val(h.cards[0])===val(h.cards[1])&&!h.splitAces&&seat.hands.length<4&&S.bank>=h.bet;
-function hit(){const h=curHand();h.cards.push(draw());const t=tot(h.cards).t;if(t>21)S.sfxEnd="bust";if(t>=21)h.done=true;next()}
+function hit(){const h=curHand();h.cards.push(draw());const v=tot(h.cards).t;if(v>21)S.sfxEnd="bust";if(v>=21)h.done=true;next()}
 function stand(){curHand().done=true;next()}
 function dbl(){const h=curHand();if(!canDouble(h))return;S.bank-=h.bet;h.bet*=2;h.doubled=true;ST.doubles++;sfx("chip");h.cards.push(draw());if(tot(h.cards).t>21)S.sfxEnd="bust";h.done=true;next()}
 function split(){const seat=S.seats[S.cur.s],h=curHand();if(!canSplit(seat,h))return;
@@ -413,55 +532,37 @@ const SOFT0={12:"HHHHHHHHHH",13:"HHHDDHHHHH",14:"HHHDDHHHHH",15:"HHDDDHHHHH",16:
 const PAIRS={2:"PPPPPPHHHH",3:"PPPPPPHHHH",4:"HHHPPHHHHH",5:"DDDDDDDDHH",6:"PPPPPHHHHH",7:"PPPPPPHHHH",8:"PPPPPPPPPP",9:"PPPPPSPPSS",10:"SSSSSSSSSS",11:"PPPPPPPPPP"};
 function T(){if(!R().h17)return{HARD:HARD0,SOFT:SOFT0,PAIRS};
   return{HARD:{...HARD0,11:"DDDDDDDDDD",15:"SSSSSHHHRR",17:"SSSSSSSSSR"},SOFT:{...SOFT0,18:"XXXXXSSHHH",19:"SSSSXSSSSS"},PAIRS}}
-const NAME={hit:"Kaart",stand:"Pas",double:"Verdubbel",split:"Splits",surrender:"Opgeven"};
 function advise(seat,h){
-  const up=val(S.dealer[0]),col=up===11?9:up-2,{t,soft}=tot(h.cards),c=h.cards;
+  const up=val(S.dealer[0]),col=up===11?9:up-2,{t:v,soft}=tot(h.cards),c=h.cards;
   let tbl,key,code;const{HARD,SOFT}=T();
   const pv=c.length===2&&val(c[0])===val(c[1])?val(c[0]):0;
   if(pv&&(PAIRS[pv][col]!=="P"||canSplit(seat,h))){tbl="pair";key=pv;code=PAIRS[pv][col]}
-  else if(soft){tbl="soft";key=t;code=SOFT[t][col]}
-  else{tbl="hard";key=Math.min(18,Math.max(8,t));code=HARD[key][col]}
+  else if(soft){tbl="soft";key=v;code=SOFT[v][col]}
+  else{tbl="hard";key=Math.min(18,Math.max(8,v));code=HARD[key][col]}
   let action={H:"hit",S:"stand",P:"split"}[code];
   if(code==="D")action=canDouble(h)?"double":"hit";
   if(code==="X")action=canDouble(h)?"double":"stand";
   if(code==="R")action=canSurrender(seat,h)?"surrender":"hit";
-  return{action,tbl,key,col,t,soft,up,pv}}
-function reason(a){
-  const upN=a.up===11?"een aas":`een ${a.up}`,weak=a.up<=6,sv=(a.soft?"zacht ":"")+a.t;
-  switch(a.action){
-    case"split":return a.pv===11?"twee azen splitsen geeft je twee kansen op 21.":a.pv===8?"twee achten zijn samen 16, de slechtste hand. Apart zijn ze een veel betere start."
-      :weak?`de dealer staat zwak met ${upN}. Met twee handen profiteer je daar twee keer van.`:"apart zijn deze kaarten een sterkere start dan samen.";
-    case"double":return`met ${sv} heb je een goede kans op een sterke hand met één kaart${weak?`, en de dealer staat zwak met ${upN}`:""}. Zet dubbel in.`;
-    case"surrender":return`met ${a.t} tegen ${upN} verlies je deze hand meestal. Opgeven kost maar de helft van je inzet.`;
-    case"stand":return a.soft?`zacht ${a.t} is al een goede hand tegen ${upN}.`:a.t>=17?`${a.t} is sterk genoeg. Met nog een kaart ga je vaak kapot.`
-      :`de dealer toont ${upN} en moet doorpakken tot 17, met een grote kans om kapot te gaan. Laat hem dat risico nemen.`;
-    default:return a.t<=11?`met ${a.t} kun je niet kapot gaan.`:a.soft?`met ${sv} kun je niet kapot gaan en kun je je hand nog verbeteren.`
-      :`tegen ${upN} eindigt de dealer vaak op 17 of meer. Met ${a.t} moet je je hand verbeteren.`}}
-function showHint(){
-  if(S.phase==="ins"){S.hint="geen verzekering. Verzekering is op de lange duur altijd een verliezende gok, ook als je zelf blackjack hebt.";ST.hints++;return render()}
-  if(S.phase!=="play"||S.pending)return;
-  const a=advise(S.seats[S.cur.s],curHand());S.hint=`${NAME[a.action]}: ${reason(a)}`;ST.hints++;render()}
+  return{action,tbl,key,col}}
 
 // ---------- waarschuwingen: alleen bij overduidelijke fouten ----------
 function mistake(action){
-  const h=curHand(),{t,soft}=tot(h.cards);
-  if(action==="surrender"&&(t<=11||soft||t>=19))return`met ${soft?"zacht ":""}${t} heb je nog prima kansen. Opgeven kost je direct de helft van je inzet.`;
-  if(action==="hit"&&!soft&&t>=17)return`je hebt ${t}. Met nog een kaart ga je ${t>=19?"vrijwel zeker":"waarschijnlijk"} kapot.`;
-  if(action==="stand"&&t<=11)return`je hebt pas ${t}. Met een extra kaart kun je nooit kapot gaan.`;
-  if(action==="stand"&&soft&&t<=16)return`je hebt zacht ${t} (${t-10}/${t}). Je aas kan als 1 tellen, dus een extra kaart kan je niet kapot maken.`;
-  if(action==="double"&&t>=20)return`je hebt al ${t}. Verdubbelen geeft je nog maar één kaart en maakt een sterke hand alleen slechter.`;
-  if(action==="double"&&!soft&&t>=17)return`met ${t} verdubbel je je inzet terwijl de extra kaart je waarschijnlijk kapot maakt.`;
-  if(action==="split"&&val(h.cards[0])===10)return`twee tienen zijn samen 20, een van de sterkste handen. Splitsen gooit dat weg.`;
-  if(action==="split"&&h.cards[0].r==="5")return`twee vijven zijn samen 10, ideaal om op te verdubbelen. Gesplitst heb je twee zwakke handen.`;
+  const h=curHand(),{t:v,soft}=tot(h.cards);
+  if(action==="surrender"&&(v<=11||soft||v>=19))return{k:"mSurr",a:[v,soft]};
+  if(action==="hit"&&!soft&&v>=17)return{k:"mHit",a:[v]};
+  if(action==="stand"&&v<=11)return{k:"mStandLow",a:[v]};
+  if(action==="stand"&&soft&&v<=16)return{k:"mStandSoft",a:[v]};
+  if(action==="double"&&v>=20)return{k:"mDbl20",a:[v]};
+  if(action==="double"&&!soft&&v>=17)return{k:"mDblHard",a:[v]};
+  if(action==="split"&&val(h.cards[0])===10)return{k:"mSplit10"};
+  if(action==="split"&&h.cards[0].r==="5")return{k:"mSplit5"};
   return null}
 const ACTIONS={hit,stand,double:dbl,split,surrender};
 function act(name){if(S.phase!=="play"||S.pending)return;const seat=S.seats[S.cur.s],h=curHand();
   if((name==="double"&&!canDouble(h))||(name==="split"&&!canSplit(seat,h))||(name==="surrender"&&!canSurrender(seat,h)))return;
   const w=P.tips&&mistake(name);
-  if(w){S.pending={name,text:w};sfx("warn");return render()}doAction(name)}
-function doAction(name){const a=advise(S.seats[S.cur.s],curHand());ST.decisions++;
-  if(a.action===name)ST.correct++;else S.notes.push(`Box ${S.cur.s+1}: ${NAME[name]}, basisstrategie zegt ${NAME[a.action]}`);
-  S.hint=null;ACTIONS[name]()}
+  if(w){S.pending={name,m:w};sfx("warn");return render()}doAction(name)}
+function doAction(name){const a=advise(S.seats[S.cur.s],curHand());ST.decisions++;if(a.action===name)ST.correct++;ACTIONS[name]()}
 function confirmPending(go){const p=S.pending;S.pending=null;if(go&&p){ST.ignored++;doAction(p.name)}else render()}
 
 function dealerPlay(){
@@ -473,30 +574,30 @@ function settle(){
   const d=tot(S.dealer).t,dBJ=S.dealer.length===2&&d===21;let anyBJ=false;
   S.seats.forEach((s,i)=>{
     if(!s.bet)return;
-    if(s.ins&&dBJ){const w=s.ins*2;S.bank+=s.ins*3;s.res.ins={win:w};ST.insWon++;S.notes.push(`Box ${i+1}: verzekering +€${w}`)}
-    s.hands.forEach(h=>{const t=tot(h.cards).t,nat=natural(h);let pay=0,label,cls;
-      if(h.surrendered){pay=Math.ceil(h.bet/2);label="Opgegeven";cls="push"}
-      else if(t>21){label="Kapot";cls="lose"}
-      else if(dBJ){if(nat){pay=h.bet;label="Push";cls="push"}else{label="Dealer BJ";cls="lose"}}
-      else if(nat){const w=Math.floor(h.bet*R().bj);pay=h.bet+w;label=`Blackjack +€${w}`;cls="win"}
-      else if(d>21||t>d){pay=h.bet*2;label=`+€${h.bet}`;cls="win"}
-      else if(t<d){label="Verloren";cls="lose"}
-      else{pay=h.bet;label="Push";cls="push"}
-      S.bank+=pay;h.res={label,cls};ST.hands++;
+    if(s.ins&&dBJ){const w=s.ins*2;S.bank+=s.ins*3;s.res.ins={win:w};ST.insWon++;S.notes.push({k:"insWin",a:[i+1,w]})}
+    s.hands.forEach(h=>{const v=tot(h.cards).t,nat=natural(h);let pay=0,lab,cls;
+      if(h.surrendered){pay=Math.ceil(h.bet/2);lab={k:"rSurr"};cls="push"}
+      else if(v>21){lab={k:"rBust"};cls="lose"}
+      else if(dBJ){if(nat){pay=h.bet;lab={k:"rPush"};cls="push"}else{lab={k:"rDealerBJ"};cls="lose"}}
+      else if(nat){const w=Math.floor(h.bet*R().bj);pay=h.bet+w;lab={k:"rBJ",a:[w]};cls="win"}
+      else if(d>21||v>d){pay=h.bet*2;lab={k:"rWin",a:[h.bet]};cls="win"}
+      else if(v<d){lab={k:"rLose"};cls="lose"}
+      else{pay=h.bet;lab={k:"rPush"};cls="push"}
+      S.bank+=pay;h.res={m:lab,cls};ST.hands++;
       if(h.surrendered)ST.surrenders++;
       else if(cls==="win"){ST.wins++;if(nat){ST.bj++;anyBJ=true}if(h.doubled)ST.doubleWins++}
-      else if(cls==="lose"){ST.losses++;if(t>21)ST.busts++}else ST.pushes++});
-    const[a,b]=S.dealer;settleSide(s,i,"dp",a.r===b.r?{name:"Dealer pair",mult:11}:null);
+      else if(cls==="lose"){ST.losses++;if(v>21)ST.busts++}else ST.pushes++});
+    const[a,b]=S.dealer;settleSide(s,i,"dp",a.r===b.r?{name:"dPair",mult:11}:null);
   });
   const net=S.bank-S.startBank;
-  S.msg=(dBJ?"Dealer heeft blackjack. ":d>21?"Dealer kapot! ":"")+(net>0?`Ronde: +€${net}`:net<0?`Ronde: −€${-net}`:"Ronde: gelijk");
+  S.msg={k:"result",a:[dBJ,d>21,net]};
   S.cls=net>0?"win":net<0?"lose":"push";
   ST.rounds++;ST.net+=net;ST.bestRound=Math.max(ST.bestRound,net);ST.worstRound=Math.min(ST.worstRound,net);
   if(net>0){ST.streak++;ST.bestStreak=Math.max(ST.bestStreak,ST.streak)}else if(net<0)ST.streak=0;
   ST.peak=Math.max(ST.peak,S.bank);
   S.sfxEnd=anyBJ&&net>0?"bj":net>0?"win":net<0?"lose":"push";
   if(!ST.hist.length)ST.hist.push(S.startBank);ST.hist.push(S.bank);
-  if(S.bank<5){S.bank+=1000;S.notes.push("Saldo op: je krijgt €1000 erbij");ST.hist.push(S.bank)}
+  if(S.bank<5){S.bank+=1000;S.notes.push({k:"refill"});ST.hist.push(S.bank)}
   if(ST.hist.length>300)ST.hist.splice(0,ST.hist.length-300);
   render()}
 
@@ -506,10 +607,20 @@ function cardHTML(c,hidden){
   const key=(hidden?"b":"f")+c.u,isNew=!seen.has(key);newKeys.push(key);
   const dl=Math.max(0,(c.u-minNew)*0.1);if(isNew)newDelays.push(dl);
   const st=isNew?` style="animation-delay:${dl.toFixed(2)}s"`:"";
-  if(hidden)return`<div class="card back${isNew?" new":""}"${st} aria-label="Verborgen kaart"></div>`;
-  return`<div class="card${c.red?" red":""}${isNew?" new":""}"${st} aria-label="${c.r} ${c.s}"><span class="c">${c.r}<small>${c.s}</small></span><span class="mid">${c.s}</span></div>`}
+  if(hidden)return`<div class="card back${isNew?" new":""}"${st} aria-label="${t("hiddenCard")}"></div>`;
+  const r=rk(c);
+  return`<div class="card${c.red?" red":""}${isNew?" new":""}"${st} aria-label="${r} ${c.s}"><span class="c">${r}<small>${c.s}</small></span><span class="mid">${c.s}</span></div>`}
+function applyStatic(){
+  document.documentElement.lang=L();document.title=t("docTitle");
+  document.querySelectorAll("[data-t]").forEach(el=>{const txt=t(el.dataset.t),k=el.dataset.k;
+    if(k)el.innerHTML=esc(txt)+`<kbd>${esc(k[0]==="@"?t(k.slice(1)):k)}</kbd>`;else el.textContent=txt});
+  const lb=$("langBtn");lb.textContent=t("langBtn");lb.setAttribute("aria-label",t("langAria"));lb.lang=L()==="nl"?"en":"nl";
+  $("siteFoot").innerHTML=t("foot");
+  $("pay").innerHTML=t("pay").map(([h,rows],i,arr)=>`<div><h3>${h}</h3><table>${rows.map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</table>${i===arr.length-1?`<p style="margin:6px 0 0">${t("payNote")}</p>`:""}</div>`).join("");
+}
 function render(){
   const hide=S.phase==="ins"||S.phase==="play",betting=S.phase==="bet"||S.phase==="done";
+  applyStatic();
   // bepaal welke kaarten nieuw zijn, voor gespreide deel-animatie
   minNew=Infinity;newKeys=[];newDelays=[];
   const chk=(c,h)=>{if(!seen.has((h?"b":"f")+c.u))minNew=Math.min(minNew,c.u)};
@@ -518,93 +629,81 @@ function render(){
   $("dscore").textContent=!S.dealer.length?"–":hide?val(S.dealer[0]):scoreText(S.dealer);
   $("seats").innerHTML=S.seats.map((s,i)=>{
     const on=(S.cur&&S.cur.s===i)||S.insSeat===i,idle=!betting&&!s.bet;
-    const hands=s.hands.map((h,j)=>{const act=S.cur&&S.cur.s===i&&S.cur.h===j;
-      return`<div class="hand${act?" on":""}"><div class="cards">${h.cards.map(c=>cardHTML(c,false)).join("")}</div>
-      <div class="meta"><span class="score">${scoreText(h.cards)}</span>${s.hands.length>1||h.doubled?`<span class="tag">€${h.bet}${h.doubled?" 2×":""}</span>`:""}${h.res?`<span class="tag ${h.res.cls}">${h.res.label}</span>`:""}</div></div>`}).join("");
+    const hands=s.hands.map((h,j)=>{const cur=S.cur&&S.cur.s===i&&S.cur.h===j;
+      return`<div class="hand${cur?" on":""}"><div class="cards">${h.cards.map(c=>cardHTML(c,false)).join("")}</div>
+      <div class="meta"><span class="score">${scoreText(h.cards)}</span>${s.hands.length>1||h.doubled?`<span class="tag">€${h.bet}${h.doubled?" 2×":""}</span>`:""}${h.res?`<span class="tag ${h.res.cls}">${esc(h.res.m?tm(h.res.m):h.res.label||"")}</span>`:""}</div></div>`}).join("");
     const side=(k,l)=>{const r=s.res[k],cls=r?(r.win?" won":" lost"):"";
-      return`<div class="side"><button class="spot sm${s[k]?" has":""}${cls}" data-seat="${i}" data-spot="${k}" ${betting?"":"disabled"} aria-label="${l} inzet box ${i+1}">${s[k]||""}</button><span class="l${r&&r.win?" win":""}">${r&&r.win?"+€"+r.win:l}</span></div>`};
-    const ins=s.ins?`<span class="tag${s.res.ins?(s.res.ins.win?" win":" lose"):""}">Verz. €${s.ins}</span>`:"";
+      return`<div class="side"><button class="spot sm${s[k]?" has":""}${cls}" data-seat="${i}" data-spot="${k}" ${betting?"":"disabled"} aria-label="${esc(t("sideAria",l,i+1))}">${s[k]||""}</button><span class="l${r&&r.win?" win":""}">${r&&r.win?"+€"+r.win:l}</span></div>`};
+    const ins=s.ins?`<span class="tag${s.res.ins?(s.res.ins.win?" win":" lose"):""}">${t("insTag",s.ins)}</span>`:"";
     return`<div class="seat${on?" on":""}${idle?" idle":""}">
       <div class="hands">${hands}</div>
-      <div class="spots"><button class="spot main${s.bet?" has":""}" data-seat="${i}" data-spot="bet" ${betting?"":"disabled"} aria-label="Hoofdinzet box ${i+1}">${s.bet?"€"+s.bet:"+"}</button>
+      <div class="spots"><button class="spot main${s.bet?" has":""}" data-seat="${i}" data-spot="bet" ${betting?"":"disabled"} aria-label="${esc(t("mainAria",i+1))}">${s.bet?"€"+s.bet:"+"}</button>
       <div class="sides">${side("pair","Pair")}${side("t213","21+3")}${side("dp","D-pair")}</div></div>
-      <div class="seat-foot">Box ${i+1}${ins}${S.phase==="bet"&&(s.bet||s.pair||s.t213||s.dp)?` <button class="x" data-clear="${i}">wis</button>`:""}</div></div>`}).join("");
+      <div class="seat-foot">${t("hand",i+1)}${ins}${S.phase==="bet"&&(s.bet||s.pair||s.t213||s.dp)?` <button class="x" data-clear="${i}">${t("clear")}</button>`:""}</div></div>`}).join("");
   newKeys.forEach(k=>seen.add(k));
   newDelays.forEach(dl=>sfx("card",dl));
   if(S.sfxEnd){sfx(S.sfxEnd,(newDelays.length?Math.max(...newDelays):0)+.35);S.sfxEnd=null}
-  $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=P.sound?"Geluid aan":"Geluid uit";
-  $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=P.tips?"Waarschuwingen aan":"Waarschuwingen uit";
-  $("warnCtl").hidden=!S.pending;if(S.pending)$("warnText").textContent=S.pending.text;
+  $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=t(P.sound?"soundOn":"soundOff");
+  $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=t(P.tips?"warnOn":"warnOff");
+  $("warnCtl").hidden=!S.pending;if(S.pending)$("warnText").textContent=S.pending.m?tm(S.pending.m):S.pending.text||"";
   renderStats();renderExtras();
   $("bank").textContent="€"+S.bank;
-  $("msg").textContent=S.msg;$("msg").className="msg "+S.cls;
-  $("notes").textContent=S.notes.slice(-3).join(" · ");
+  $("msg").textContent=tm(S.msg);$("msg").className="msg "+S.cls;
+  $("notes").textContent=S.notes.slice(-3).map(tm).join(" · ");
   $("chipRow").hidden=!betting;
   document.querySelectorAll(".chip").forEach(c=>{c.setAttribute("aria-pressed",+c.dataset.v===S.chip);c.disabled=+c.dataset.v>S.bank&&S.phase==="bet"});
   $("betCtl").hidden=S.phase!=="bet";$("insCtl").hidden=S.phase!=="ins";$("playCtl").hidden=S.phase!=="play"||!!S.pending;$("doneCtl").hidden=S.phase!=="done";
   $("deal").disabled=!S.seats.some(s=>s.bet);
   $("clearAll").disabled=!tableBets();
   $("rebet").disabled=!S.last;
-  if(S.phase==="ins"){const a=Math.floor(S.seats[S.insSeat].bet/2);$("insYes").innerHTML=`Verzekeren box ${S.insSeat+1} (€${a})<kbd>J</kbd>`;$("insYes").disabled=a>S.bank}
+  if(S.phase==="ins"){const a=Math.floor(S.seats[S.insSeat].bet/2);$("insYes").innerHTML=esc(t("insYes",S.insSeat+1,a))+"<kbd>1</kbd>";$("insYes").disabled=a>S.bank}
   if(S.phase==="play"){const seat=S.seats[S.cur.s],h=curHand();$("double").disabled=!canDouble(h);$("split").disabled=!canSplit(seat,h);$("surrender").disabled=!canSurrender(seat,h)}
   $("again").disabled=!S.last;
-  $("hint").textContent=S.phase==="bet"?"Speel op één, twee of drie boxen. Klik een vak om het gekozen fiche in te zetten. Toetsen 1 tot 4 kiezen een fiche."
-    :S.phase==="ins"?"Verzekering kost de helft van je inzet en betaalt 2 : 1 als de dealer blackjack heeft.":"";
+  $("hint").textContent=S.phase==="bet"?t("betHint"):S.phase==="ins"?t("insHint"):"";
   save()}
 
-const euro=n=>(n<0?"−€":"€")+Math.abs(n);
 const pct=(a,b)=>b?Math.round(a/b*100)+"%":"–";
 function renderStats(){
-  const decided=ST.wins+ST.losses,signed=n=>n>0?"+"+euro(n):euro(n),cl=n=>n>0?"pos":n<0?"neg":"";
-  const tiles=[
-    ["Rondes",ST.rounds],["Handen",ST.hands,`${ST.wins} gewonnen · ${ST.losses} verloren · ${ST.pushes} push`],
-    ["Winstpercentage",pct(ST.wins,decided),"pushes niet meegeteld"],["Netto resultaat",signed(ST.net),"",cl(ST.net)],
-    ["Blackjacks",ST.bj],["Kapot gegaan",ST.busts,pct(ST.busts,ST.hands)+" van je handen"],
-    ["Beste ronde",signed(ST.bestRound),"",cl(ST.bestRound)],["Slechtste ronde",signed(ST.worstRound),"",cl(ST.worstRound)],
-    ["Hoogste saldo",euro(ST.peak)],["Langste winstreeks",ST.bestStreak,`nu ${ST.streak} op rij`],
-    ["Verdubbeld",ST.doubles,`${ST.doubleWins} keer gewonnen`],["Gesplitst",ST.splits],
-    ["Sidebets geraakt",`${ST.sideWins}/${ST.sideBets}`,`+${euro(ST.sideWon)} uitbetaald`],["Verzekering",`${ST.insWon}/${ST.insTaken}`,"keer uitbetaald"],
-    ["Juiste keuzes",pct(ST.correct,ST.decisions),`${ST.correct}/${ST.decisions} volgens basisstrategie`],["Hints gebruikt",ST.hints],
-    ["Opgegeven",ST.surrenders],
-    ["Waarschuwingen genegeerd",ST.ignored]];
+  const decided=ST.wins+ST.losses,cl=n=>n>0?"pos":n<0?"neg":"";
+  const x={...ST,winPct:pct(ST.wins,decided),bustPct:pct(ST.busts,ST.hands),correctPct:pct(ST.correct,ST.decisions),
+    netCls:cl(ST.net),bestCls:cl(ST.bestRound),worstCls:cl(ST.worstRound)};
   $("chart").innerHTML=chartSVG();
-  $("stats").innerHTML=tiles.map(([l,v,sub,c])=>`<div class="stat"><span>${l}</span><b class="${c||""}">${v}</b>${sub?`<small>${sub}</small>`:""}</div>`).join("");
-  $("statsSum").textContent=ST.rounds?`Statistieken · ${ST.rounds} rondes · ${pct(ST.wins,decided)} gewonnen · ${signed(ST.net)}`:"Statistieken";
+  $("stats").innerHTML=t("tiles",x).map(([l,v,sub,c])=>`<div class="stat"><span>${l}</span><b class="${c||""}">${v}</b>${sub?`<small>${sub}</small>`:""}</div>`).join("");
+  $("statsSum").textContent=ST.rounds?t("statsSum",ST.rounds,pct(ST.wins,decided),signed(ST.net)):t("statsTitle");
+  $("resetStats").textContent=t(resetArmed?"resetConfirm":"reset");
 }
 function chartSVG(){
-  const h=ST.hist;if(h.length<2)return`<p class="empty">Speel een paar rondes om het verloop van je saldo te zien.</p>`;
+  const h=ST.hist;if(h.length<2)return`<p class="empty">${t("chartEmpty")}</p>`;
   const W=420,H=150,pl=52,pr=10,pt=12,pb=24;let lo=Math.min(...h),hi=Math.max(...h);if(lo===hi){lo-=10;hi+=10}
   const x=i=>pl+(W-pl-pr)*i/(h.length-1),y=v=>pt+(H-pt-pb)*(1-(v-lo)/(hi-lo));
   const pts=h.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" "),b=h[0],end=h[h.length-1];
-  return`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Saldo per ronde, van ${euro(b)} naar ${euro(end)}">
+  return`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(t("chartAria",euro(b),euro(end)))}">
     <line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(hi)}" y2="${y(hi)}"/><line class="grid" x1="${pl}" x2="${W-pr}" y1="${y(lo)}" y2="${y(lo)}"/>
     ${b>lo&&b<hi?`<line class="base" x1="${pl}" x2="${W-pr}" y1="${y(b)}" y2="${y(b)}"/>`:""}
     <polygon class="area" points="${x(0)},${y(lo)} ${pts} ${x(h.length-1)},${y(lo)}"/>
     <polyline class="line" points="${pts}"/>
     <circle class="dot" cx="${x(h.length-1)}" cy="${y(end)}" r="4"/>
     <text x="${pl-6}" y="${y(hi)+4}" text-anchor="end">${euro(hi)}</text><text x="${pl-6}" y="${y(lo)+4}" text-anchor="end">${euro(lo)}</text>
-    <text x="${pl}" y="${H-6}">start</text><text x="${W-pr}" y="${H-6}" text-anchor="end">nu: ${euro(end)}</text></svg>`}
-const LET={H:"K",S:"P",D:"V",X:"Vp",P:"Sp",R:"O"};
+    <text x="${pl}" y="${H-6}">${t("chartStart")}</text><text x="${W-pr}" y="${H-6}" text-anchor="end">${t("chartNow")}: ${euro(end)}</text></svg>`}
 function tableHTML(title,id,keys,label,data,hl){
-  const on=hl&&hl.tbl===id;
+  const on=hl&&hl.tbl===id,LET=t("letters");
   return`<div><h3>${title}</h3><div class="tw"><table><thead><tr><th></th>${COLS.map((c,i)=>`<th class="${on&&hl.col===i?"hl":""}">${c}</th>`).join("")}</tr></thead><tbody>
   ${keys.map(k=>`<tr><th class="${on&&hl.key===k?"hl":""}">${label(k)}</th>${[...data[k]].map((ch,i)=>`<td class="k${ch}${on&&hl.key===k&&hl.col===i?" cur":""}">${LET[ch]}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`}
 function renderExtras(){
-  const hb=S.hint&&(S.phase==="play"||S.phase==="ins")&&!S.pending;$("hintBox").hidden=!hb;if(hb)$("hintText").textContent=S.hint;
-  $("showTable").hidden=S.phase!=="play";
   const hl=S.phase==="play"&&S.cur?advise(S.seats[S.cur.s],curHand()):null;
   const rng=(a,b)=>Array.from({length:b-a+1},(_,i)=>a+i),{HARD,SOFT}=T(),r=R();
-  $("tables").innerHTML=tableHTML("Harde handen","hard",rng(8,18),k=>k===8?"5–8":k===18?"18+":k,HARD,hl)
-    +tableHTML("Zachte handen (met aas)","soft",rng(13,20),k=>`A,${k-11}`,SOFT,hl)
-    +tableHTML("Paren","pair",rng(2,11),k=>k===11?"A,A":`${k},${k}`,PAIRS,hl);
-  const dl=r.decks===1?"1 kaartspel":`${r.decks} kaartspellen`,dealer=r.h17?"dealer neemt een kaart op zacht 17":"dealer staat op 17";
-  $("ruleLine").textContent=`Blackjack ${r.bj===1.5?"3 : 2":"6 : 5"} · ${dealer[0].toUpperCase()+dealer.slice(1)} · ${dl} · Verzekering 2 : 1 · Opgeven toegestaan`;
-  $("tableNote").textContent=`Basisstrategie voor deze tafel: ${dealer}, verdubbelen na splitsen mag, opgeven mag${r.dbl911?", verdubbelen alleen op 9 tot en met 11":""}.${r.decks<=2?" De tabel is gemaakt voor 4 of meer kaartspellen; met 1 of 2 wijkt het beste advies soms een klein beetje af.":""} De kolommen zijn de open kaart van de dealer. Tijdens je beurt is je situatie omlijnd.`;
+  $("tables").innerHTML=tableHTML(t("tHard"),"hard",rng(8,18),k=>k===8?"5–8":k===18?"18+":k,HARD,hl)
+    +tableHTML(t("tSoft"),"soft",rng(13,20),k=>`A,${k-11}`,SOFT,hl)
+    +tableHTML(t("tPairs"),"pair",rng(2,11),k=>k===11?"A,A":`${k},${k}`,PAIRS,hl);
+  const LET=t("letters"),LEG=t("legend");
+  $("legend").innerHTML=["H","S","D","X","P","R"].map(c=>`<span><i class="k${c}">${LET[c]}</i>${LEG[c]}</span>`).join("");
+  $("ruleLine").textContent=t("ruleLine",r);
+  $("tableNote").textContent=t("tableNote",r);
   const can=S.phase==="bet"||S.phase==="done";
   [["rDecks",r.decks],["rH17",r.h17?1:0],["rBJ",r.bj],["rDbl",r.dbl911?1:0]].forEach(([id,v])=>{$(id).value=String(v);$(id).disabled=!can})}
 function setRule(key,v){if(!(S.phase==="bet"||S.phase==="done"))return render();
   if(key==="decks"&&v!==R().decks)S.shoe=[];P.rules={...R(),[key]:v};render()}
-function again(){newRound();if(placeLast())deal();else render()}
+function again(){if(S.phase!=="done")return;newRound();if(placeLast())deal();else render()}
 function save(){try{const b=S.phase==="bet"?S.bank+tableBets():S.phase==="done"?S.bank:S.startBank;localStorage.setItem("bj-bank",b);
   localStorage.setItem("bj-stats",JSON.stringify(ST));localStorage.setItem("bj-prefs",JSON.stringify(P))}catch(e){}}
 function load(){try{const b=+localStorage.getItem("bj-bank");if(b>0){S.bank=b;S.startBank=b}
@@ -612,6 +711,7 @@ function load(){try{const b=+localStorage.getItem("bj-bank");if(b>0){S.bank=b;S.
   const p=JSON.parse(localStorage.getItem("bj-prefs")||"null");if(p){const rules={...P.rules,...(p.rules||{})};P=Object.assign(P,p);P.rules=rules}}catch(e){}}
 
 // ---------- bediening ----------
+let resetArmed=null;
 $("seats").addEventListener("click",e=>{const b=e.target.closest("[data-spot]");if(b)return addBet(+b.dataset.seat,b.dataset.spot);
   const x=e.target.closest("[data-clear]");if(x)clearSeat(+x.dataset.clear)});
 document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{S.chip=+c.dataset.v;render()});
@@ -619,33 +719,31 @@ $("clearAll").onclick=()=>{clearAll();render()};
 $("rebet").onclick=()=>{placeLast();render()};
 $("deal").onclick=deal;
 $("insYes").onclick=()=>insDecide(true);$("insNo").onclick=()=>insDecide(false);
-$("hit").onclick=()=>act("hit");$("stand").onclick=()=>act("stand");$("double").onclick=()=>act("double");$("split").onclick=()=>act("split");
+$("hit").onclick=()=>act("hit");$("stand").onclick=()=>act("stand");$("double").onclick=()=>act("double");$("split").onclick=()=>act("split");$("surrender").onclick=()=>act("surrender");
 $("warnGo").onclick=()=>confirmPending(true);$("warnCancel").onclick=()=>confirmPending(false);
 $("soundBtn").onclick=()=>{P.sound=!P.sound;render();sfx("chip")};
 $("tipsBtn").onclick=()=>{P.tips=!P.tips;if(!P.tips)S.pending=null;render()};
-let resetArmed=null;
-$("resetStats").onclick=()=>{const b=$("resetStats");
-  if(resetArmed){clearTimeout(resetArmed);resetArmed=null;ST=ST0();ST.peak=S.bank;b.textContent="Statistieken wissen";render();return}
-  b.textContent="Klik nogmaals om alles te wissen";resetArmed=setTimeout(()=>{resetArmed=null;b.textContent="Statistieken wissen"},3000)};
+$("langBtn").onclick=()=>{P.lang=L()==="nl"?"en":"nl";render()};
+$("resetStats").onclick=()=>{
+  if(resetArmed){clearTimeout(resetArmed);resetArmed=null;ST=ST0();ST.peak=S.bank;render();return}
+  resetArmed=setTimeout(()=>{resetArmed=null;renderStats()},3000);renderStats()};
 $("newRound").onclick=()=>{newRound();render()};
 $("again").onclick=again;
-$("surrender").onclick=()=>act("surrender");$("hintBtn").onclick=showHint;
-$("showTable").onclick=()=>{$("tableBox").open=true;$("tableBox").scrollIntoView({behavior:"smooth",block:"start"})};
 $("rDecks").onchange=e=>setRule("decks",+e.target.value);
 $("rH17").onchange=e=>setRule("h17",e.target.value==="1");
 $("rBJ").onchange=e=>setRule("bj",+e.target.value);
 $("rDbl").onchange=e=>setRule("dbl911",e.target.value==="1");
-const KEYMAP={k:"hit",p:"stand",v:"double",s:"split",o:"surrender"};
+const PLAYKEYS={"1":"hit","2":"stand","3":"double","4":"split","5":"surrender"};
 addEventListener("keydown",e=>{
   if(e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;
   if(e.target.closest&&e.target.closest("input,textarea,select,summary"))return;
   const k=e.key.toLowerCase();let ok=true;
   const chip=["1","2","3","4"].indexOf(k);
-  if(S.pending){if(k==="escape"||k==="enter")confirmPending(false);else if(KEYMAP[k]===S.pending.name)confirmPending(true);else ok=false}
-  else if(S.phase==="play"){if(KEYMAP[k])act(KEYMAP[k]);else if(k==="?"||k==="i")showHint();else ok=false}
-  else if(S.phase==="ins"){if(k==="j"||k==="y")insDecide(true);else if(k==="n")insDecide(false);else if(k==="?"||k==="i")showHint();else ok=false}
-  else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="h"){placeLast();render()}else if(chip>=0){S.chip=[5,25,100,500][chip];render()}else ok=false}
-  else if(S.phase==="done"){if(k===" "||k==="enter")again();else if(k==="n"){newRound();render()}else if(chip>=0){S.chip=[5,25,100,500][chip];render()}else ok=false}
+  if(S.pending){if(k==="escape"||k==="enter"||k==="1")confirmPending(false);else if(k==="2")confirmPending(true);else ok=false}
+  else if(S.phase==="play"){if(PLAYKEYS[k])act(PLAYKEYS[k]);else ok=false}
+  else if(S.phase==="ins"){if(k==="1")insDecide(true);else if(k==="2")insDecide(false);else ok=false}
+  else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="5"){placeLast();render()}else if(chip>=0){S.chip=[5,25,100,500][chip];render()}else ok=false}
+  else if(S.phase==="done"){if(k==="1"){newRound();render()}else if(k==="2"||k===" "||k==="enter")again();else ok=false}
   else ok=false;
   if(ok)e.preventDefault()});
 
