@@ -272,6 +272,7 @@ body.noscroll{overflow:hidden}
     <div class="row" id="doneCtl" hidden>
       <button class="btn ghost" id="newRound" data-t="newRound" data-k="1">Nieuwe inzet</button>
       <button class="btn primary" id="again" data-t="again" data-k="2">Zelfde inzet &amp; delen</button>
+      <button class="btn" id="againX2" data-t="againX2" data-k="3">Dubbele inzet &amp; delen</button>
     </div>
     <div class="hint" id="hint"></div>
   </div>
@@ -402,9 +403,9 @@ nl:{
   insYes:(i,a)=>`Verzekeren hand ${i} (${euro(a)})`,insNo:"Geen verzekering",
   hit:"Kaart",stand:"Pas",double:"Verdubbel",split:"Splits",surrender:"Opgeven",
   careful:"Let op:",warnCancel:"Toch niet",warnGo:"Toch doen",
-  newRound:"Nieuwe inzet",again:"Zelfde inzet & delen",
+  newRound:"Nieuwe inzet",again:"Zelfde inzet & delen",againX2:"Dubbele inzet & delen",noFundsAgainX2:"Niet genoeg saldo voor een dubbele inzet",
   betHint:"Speel op één, twee of drie handen. Klik een vak om het gekozen fiche in te zetten. Toetsen: 1 tot 6 kiest een fiche, 7 herhaalt je inzet, 8 verdubbelt je inzet, spatie deelt.",
-  betX2:"Inzet ×2",totalBet:n=>`Totale inzet: €${n.toLocaleString("nl-NL")}`,cuePlay:"▶ Klik om te spelen",cueAgain:"▶ Klik om opnieuw te spelen",
+  betX2:"Inzet ×2",totalBet:n=>`Totale inzet: €${n.toLocaleString("nl-NL")}`,cuePlay:"▶ Klik om te spelen",
   noFundsX2:"Niet genoeg saldo om je inzet te verdubbelen",
   insHint:"Verzekering kost de helft van je inzet en betaalt 2 : 1 als de dealer blackjack heeft.",
   dealer:"Dealer",hand:i=>`Hand ${i}`,clear:"wis",insTag:a=>`Verz. ${euro(a)}`,
@@ -488,9 +489,9 @@ en:{
   insYes:(i,a)=>`Insure hand ${i} (${euro(a)})`,insNo:"No insurance",
   hit:"Hit",stand:"Stand",double:"Double",split:"Split",surrender:"Surrender",
   careful:"Careful:",warnCancel:"Never mind",warnGo:"Do it anyway",
-  newRound:"New bet",again:"Same bet & deal",
+  newRound:"New bet",again:"Same bet & deal",againX2:"Double bet & deal",noFundsAgainX2:"Not enough balance for a double bet",
   betHint:"Play one, two or three hands. Click a spot to place the selected chip. Keys: 1 to 6 picks a chip, 7 repeats your bet, 8 doubles your bet, space deals.",
-  betX2:"Bet ×2",totalBet:n=>`Total bet: €${n.toLocaleString("en-GB")}`,cuePlay:"▶ Click to play",cueAgain:"▶ Click to play again",
+  betX2:"Bet ×2",totalBet:n=>`Total bet: €${n.toLocaleString("en-GB")}`,cuePlay:"▶ Click to play",
   noFundsX2:"Not enough balance to double your bet",
   insHint:"Insurance costs half your bet and pays 2 : 1 if the dealer has blackjack.",
   dealer:"Dealer",hand:i=>`Hand ${i}`,clear:"clear",insTag:a=>`Ins. ${euro(a)}`,
@@ -644,9 +645,8 @@ function betX2(){if(S.phase!=="bet")return;const tb=tableBets();if(!tb)return;
   S.seats.forEach(s=>{for(const k of SPOTS)s[k]*=2});S.bank-=tb;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
 function cueAction(){
   if(S.phase==="bet"&&tableBets()>0)return"deal";
-  if(S.phase==="done"&&S.last&&S.last.reduce((a,b)=>a+b.bet+b.pair+b.t213+b.dp,0)<=S.bank)return"again";
   return null}
-function runCue(){const c=cueAction();if(c==="deal")deal();else if(c==="again")again()}
+function runCue(){if(cueAction()==="deal")deal()}
 function placeLast(){if(!S.last)return false;clearAll();
   const need=S.last.reduce((a,b)=>a+b.bet+b.pair+b.t213+b.dp,0);
   if(need>S.bank){S.msg={k:"noFundsRebet"};S.cls="lose";return false}
@@ -842,11 +842,11 @@ function render(){
   $("rebet").disabled=!S.last;
   $("betX2").disabled=!tableBets()||tableBets()>S.bank;
   if(S.phase==="bet"&&tableBets()&&S.msg&&S.msg.k==="ready")$("msg").textContent=t("totalBet",tableBets());
-  const cue=cueAction();$("cue").hidden=!cue;if(cue)$("cue").textContent=t(cue==="deal"?"cuePlay":"cueAgain");
+  const cue=cueAction();$("cue").hidden=!cue;if(cue)$("cue").textContent=t("cuePlay");
   $("msg").classList.toggle("clickable",!!cue);document.querySelector(".dealer").classList.toggle("clickable",!!cue);
   if(S.phase==="ins"){const a=Math.floor(S.seats[S.insSeat].bet/2);$("insYes").innerHTML=esc(t("insYes",S.insSeat+1,a))+"<kbd>1</kbd>";$("insYes").disabled=a>S.bank}
   if(S.phase==="play"){const seat=S.seats[S.cur.s],h=curHand();$("double").disabled=!canDouble(h);$("split").disabled=!canSplit(seat,h);$("surrender").disabled=!canSurrender(seat,h)}
-  $("again").disabled=!S.last;
+  $("again").disabled=!S.last;$("againX2").disabled=!S.last||lastTotal()*2>S.bank;
   $("hint").textContent=S.phase==="bet"?t("betHint"):S.phase==="ins"?t("insHint"):"";
   save()}
 
@@ -906,6 +906,10 @@ function renderExtras(){
 function setRule(key,v){if(!(S.phase==="bet"||S.phase==="done"))return render();
   if(key==="decks"&&v!==R().decks)S.shoe=[];P.rules={...R(),[key]:v};render()}
 function again(){if(S.phase!=="done")return;newRound();if(placeLast())deal();else render()}
+const lastTotal=()=>S.last?S.last.reduce((a,b)=>a+b.bet+b.pair+b.t213+b.dp,0):0;
+function againX2(){if(S.phase!=="done"||!S.last)return;
+  if(lastTotal()*2>S.bank){S.msg={k:"noFundsAgainX2"};S.cls="lose";return render()}
+  newRound();if(placeLast()){S.seats.forEach(s=>{for(const k of SPOTS)s[k]*=2});S.bank-=lastTotal();deal()}else render()}
 // De hele spelstand (ook een ronde die nog bezig is) wordt na elke actie bewaard, zodat je verder speelt na het sluiten van het tabblad.
 function save(){try{const b=S.phase==="bet"?S.bank+tableBets():S.phase==="done"?S.bank:S.startBank;localStorage.setItem("bj-bank",b);
   localStorage.setItem("bj-state",JSON.stringify({...S,sfxEnd:null}));
@@ -958,7 +962,7 @@ $("resetStats").onclick=()=>{
   if(resetArmed){clearTimeout(resetArmed);resetArmed=null;ST=ST0();ST.peak=S.bank;render();return}
   resetArmed=setTimeout(()=>{resetArmed=null;renderStats()},3000);renderStats()};
 $("newRound").onclick=()=>{newRound();render()};
-$("again").onclick=again;
+$("again").onclick=again;$("againX2").onclick=againX2;
 $("rDecks").onchange=e=>setRule("decks",+e.target.value);
 $("rH17").onchange=e=>setRule("h17",e.target.value==="1");
 $("rBJ").onchange=e=>setRule("bj",+e.target.value);
@@ -974,7 +978,7 @@ addEventListener("keydown",e=>{
   else if(S.phase==="play"){if(PLAYKEYS[k])act(PLAYKEYS[k]);else ok=false}
   else if(S.phase==="ins"){if(k==="1")insDecide(true);else if(k==="2")insDecide(false);else ok=false}
   else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="7"){placeLast();render()}else if(k==="8")betX2();else if(chip>=0){S.chip=CHIPS[chip];render()}else ok=false}
-  else if(S.phase==="done"){if(k==="1"){newRound();render()}else if(k==="2"||k===" "||k==="enter")again();else ok=false}
+  else if(S.phase==="done"){if(k==="1"){newRound();render()}else if(k==="2"||k===" "||k==="enter")again();else if(k==="3")againX2();else ok=false}
   else ok=false;
   if(ok)e.preventDefault()});
 
