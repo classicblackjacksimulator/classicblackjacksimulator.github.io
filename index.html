@@ -160,6 +160,52 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
 .site-foot h2{font-family:var(--f-display);font-size:15px;color:var(--ivory);margin:0 0 6px}
 .site-foot p{margin:0 0 8px}
 .site-foot strong{color:var(--brass);font-weight:700}
+:root{--bronze:#c98a54;--silver:#c9cdd2;--gold:#d9a441;--diamond:#8fd3e8}
+.menu-btn{display:inline-flex;align-items:center;gap:6px;background:var(--felt-deep);color:var(--ivory);border:1px solid color-mix(in srgb,var(--brass) 55%,transparent);border-radius:999px;padding:7px 14px;font:600 14px var(--f-body);cursor:pointer}
+.menu-btn:hover{border-color:var(--brass)}
+.overlay{position:fixed;inset:0;background:rgb(0 0 0/.5);z-index:40}
+.panel{position:fixed;top:0;right:0;bottom:0;width:min(480px,100%);background:var(--felt-deep);border-left:1px solid color-mix(in srgb,var(--brass) 35%,transparent);z-index:41;display:flex;flex-direction:column;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px);box-shadow:-10px 0 30px rgb(0 0 0/.4);animation:slidein .22s ease-out}
+@keyframes slidein{from{transform:translateX(30px);opacity:0}}
+.panel-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+.panel-head h2{font-family:var(--f-display);font-size:20px;margin:0}
+.close{background:none;border:0;color:var(--muted);font-size:28px;line-height:1;cursor:pointer;width:40px;height:40px;border-radius:50%}
+.close:hover{color:var(--ivory)}
+.tabs{display:flex;gap:4px;padding:0 12px;border-bottom:1px solid color-mix(in srgb,var(--muted) 25%,transparent)}
+.tabs button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:10px 4px;font:600 13px var(--f-body);cursor:pointer;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--ivory);border-bottom-color:var(--brass)}
+.tabpanel{overflow-y:auto;padding:14px 16px 24px;flex:1}
+.set-group{display:flex;flex-direction:column;gap:10px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid color-mix(in srgb,var(--muted) 18%,transparent)}
+.set-group:last-child{border-bottom:0;margin-bottom:0}
+.set-group h3,.tier-h{font-family:var(--f-display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
+.tier-h{margin:18px 0 8px}
+.set-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.set-row small{display:block;color:var(--muted);font-size:12px}
+.seg{display:inline-flex;border:1px solid color-mix(in srgb,var(--brass) 50%,transparent);border-radius:999px;overflow:hidden;flex:none}
+.seg button{background:none;border:0;color:var(--muted);padding:6px 12px;font:600 13px var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--brass);color:var(--ink)}
+.switch{flex:none;min-width:64px;border-radius:999px;padding:6px 12px;border:1px solid color-mix(in srgb,var(--muted) 45%,transparent);background:none;color:var(--muted);font:600 13px var(--f-body);cursor:pointer}
+.switch[aria-pressed="true"]{background:var(--win);border-color:var(--win);color:var(--felt-deep)}
+.menu-btn:focus-visible,.close:focus-visible,.tabs button:focus-visible,.seg button:focus-visible,.switch:focus-visible,.toast:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+body.noscroll{overflow:hidden}
+.pbar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--muted) 20%,transparent);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--brass);border-radius:4px}
+.pbar.sm{height:5px;margin-top:6px}
+.ach{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ach li{display:flex;gap:10px;align-items:flex-start;padding:10px;border-radius:10px;background:color-mix(in srgb,var(--felt) 55%,transparent);opacity:.72}
+.ach li.got{opacity:1;background:color-mix(in srgb,var(--brass) 10%,var(--felt-deep))}
+.ach li>div{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.ach b{color:var(--ivory)}.ach li span{font-size:13px;color:var(--muted)}
+.ach small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.ach .when{color:var(--brass)}
+.medal{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:15px;border:2px solid;box-sizing:border-box}
+.medal.bronze{border-color:var(--bronze);background:color-mix(in srgb,var(--bronze) 22%,transparent)}
+.medal.silver{border-color:var(--silver);background:color-mix(in srgb,var(--silver) 18%,transparent)}
+.medal.gold{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 22%,transparent)}
+.medal.diamond{border-color:var(--diamond);background:color-mix(in srgb,var(--diamond) 20%,transparent)}
+.toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 12px);transform:translate(-50%,-20px);opacity:0;z-index:50;display:flex;gap:10px;align-items:center;text-align:left;background:var(--felt-deep);color:var(--ivory);border:1px solid var(--brass);border-radius:14px;padding:10px 16px 10px 10px;box-shadow:0 10px 30px rgb(0 0 0/.45);transition:transform .3s,opacity .3s;cursor:pointer;max-width:calc(100% - 32px);font:inherit}
+.toast.show{transform:translate(-50%,0);opacity:1}
+.toast small{display:block;color:var(--brass);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.toast b{display:block;color:var(--ivory);font-size:15px}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}.toast{transition:none}}
 </style>
 </head>
 <body>
@@ -168,11 +214,8 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
   <header>
     <h1><span class="k">Classic</span> Black<span>jack</span> <span class="k">Simulator</span></h1>
     <div class="tools">
-      <button class="tool" id="langBtn" lang="en">English</button>
-      <button class="tool" id="soundBtn" aria-pressed="true">Geluid aan</button>
-      <button class="tool" id="tipsBtn" aria-pressed="true">Waarschuwingen aan</button>
-      <button class="tool" id="restartBtn">Opnieuw beginnen</button>
       <div class="bank"><span data-t="balance">Saldo</span> <b id="bank">€1000</b></div>
+      <button class="menu-btn" id="menuBtn" aria-haspopup="dialog" aria-controls="panel"><span aria-hidden="true">☰</span> <span data-t="menu">Menu</span></button>
     </div>
   </header>
   <div class="rule" id="ruleLine">Blackjack 3 : 2 · Dealer staat op 17 · 6 kaartspellen · Verzekering 2 : 1 · Opgeven toegestaan</div>
@@ -221,24 +264,6 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
     <div class="hint" id="hint"></div>
   </div>
 
-  <details id="statsBox">
-    <summary id="statsSum">Statistieken</summary>
-    <div class="chartwrap" id="chart"></div>
-    <div class="stats" id="stats"></div>
-    <div class="row" style="margin-top:10px"><button class="btn ghost" id="resetStats">Statistieken wissen</button></div>
-  </details>
-
-  <details id="rulesBox">
-    <summary data-t="rulesTitle">Huisregels</summary>
-    <div class="rules">
-      <label for="rDecks"><span data-t="rDecks">Aantal kaartspellen</span><select id="rDecks"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
-      <label for="rH17"><span data-t="rH17">Dealer bij zacht 17</span><select id="rH17"><option value="0" data-t="optStand">Past</option><option value="1" data-t="optHit">Neemt een kaart</option></select></label>
-      <label for="rBJ"><span data-t="rBJ">Blackjack betaalt</span><select id="rBJ"><option value="1.5">3 : 2</option><option value="1.2">6 : 5</option></select></label>
-      <label for="rDbl"><span data-t="rDbl">Verdubbelen</span><select id="rDbl"><option value="0" data-t="optAny">Op elke twee kaarten</option><option value="1" data-t="opt911">Alleen op 9, 10 of 11</option></select></label>
-    </div>
-    <p class="tnote" data-t="rulesNote">Je past de regels aan tussen rondes. Bij een ander aantal kaartspellen wordt de schoen opnieuw geschud.</p>
-  </details>
-
   <details id="tableBox">
     <summary data-t="tableTitle">Strategietabel</summary>
     <p class="tnote" id="tableNote"></p>
@@ -259,6 +284,52 @@ h1 .k{font-weight:500;color:var(--muted);font-size:.55em;letter-spacing:.02em}
   </footer>
 </div>
 
+<div class="overlay" id="overlay" hidden></div>
+<aside class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" hidden>
+  <div class="panel-head">
+    <h2 id="panelTitle" data-t="menu">Menu</h2>
+    <button class="close" id="closeBtn" aria-label="Sluiten">×</button>
+  </div>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-settings" data-tab="settings" aria-controls="pane-settings" aria-selected="true" data-t="tSettings">Instellingen</button>
+    <button role="tab" id="tab-stats" data-tab="stats" aria-controls="pane-stats" aria-selected="false" data-t="tStats">Statistieken</button>
+    <button role="tab" id="tab-ach" data-tab="ach" aria-controls="pane-ach" aria-selected="false">Achievements</button>
+  </div>
+  <div class="tabpanel" id="pane-settings" role="tabpanel" aria-labelledby="tab-settings">
+    <div class="set-group">
+      <h3 data-t="sGeneral">Algemeen</h3>
+      <div class="set-row"><span data-t="sLang">Taal</span><div class="seg"><button id="langNl" lang="nl" aria-pressed="true">Nederlands</button><button id="langEn" lang="en" aria-pressed="false">English</button></div></div>
+      <div class="set-row"><span data-t="sSound">Geluid</span><button class="switch" id="soundBtn" aria-pressed="true">Aan</button></div>
+      <div class="set-row"><span><span data-t="sWarn">Waarschuwingen</span><small data-t="sWarnSub">Bij overduidelijke fouten vraagt het spel of je het zeker weet</small></span><button class="switch" id="tipsBtn" aria-pressed="true">Aan</button></div>
+    </div>
+    <div class="set-group">
+      <h3 data-t="rulesTitle">Huisregels</h3>
+      <div class="rules">
+        <label for="rDecks"><span data-t="rDecks">Aantal kaartspellen</span><select id="rDecks"><option value="1">1</option><option value="2">2</option><option value="4">4</option><option value="6">6</option><option value="8">8</option></select></label>
+        <label for="rH17"><span data-t="rH17">Dealer bij zacht 17</span><select id="rH17"><option value="0" data-t="optStand">Past</option><option value="1" data-t="optHit">Neemt een kaart</option></select></label>
+        <label for="rBJ"><span data-t="rBJ">Blackjack betaalt</span><select id="rBJ"><option value="1.5">3 : 2</option><option value="1.2">6 : 5</option></select></label>
+        <label for="rDbl"><span data-t="rDbl">Verdubbelen</span><select id="rDbl"><option value="0" data-t="optAny">Op elke twee kaarten</option><option value="1" data-t="opt911">Alleen op 9, 10 of 11</option></select></label>
+      </div>
+      <p class="tnote" data-t="rulesNote">Je past de regels aan tussen rondes.</p>
+    </div>
+    <div class="set-group">
+      <h3 data-t="balance">Saldo</h3>
+      <p class="tnote" data-t="restartNote" style="text-align:left;margin:0"></p>
+      <div><button class="btn ghost" id="restartBtn">Opnieuw beginnen met €1000</button></div>
+    </div>
+  </div>
+  <div class="tabpanel" id="pane-stats" role="tabpanel" aria-labelledby="tab-stats" hidden>
+    <p class="tnote" id="statsSum" style="margin:0"></p>
+    <div class="chartwrap" id="chart"></div>
+    <div class="stats" id="stats"></div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" id="resetStats">Statistieken wissen</button></div>
+  </div>
+  <div class="tabpanel" id="pane-ach" role="tabpanel" aria-labelledby="tab-ach" hidden>
+    <div id="achList"></div>
+  </div>
+</aside>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
 <script>
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -271,8 +342,41 @@ let S={bank:1000,phase:"bet",chip:25,shoe:[],uid:0,dealer:[],seats:[mkSeat(),mkS
 const S_DEF={pending:null,sfxEnd:null};
 let P={sound:true,tips:true,lang:null,rules:{decks:6,h17:false,bj:1.5,dbl911:false}};
 const R=()=>P.rules;
-const ST0=()=>({decisions:0,correct:0,hints:0,surrenders:0,hist:[],rounds:0,hands:0,wins:0,losses:0,pushes:0,bj:0,busts:0,doubles:0,doubleWins:0,splits:0,sideBets:0,sideWins:0,sideWon:0,insTaken:0,insWon:0,net:0,bestRound:0,worstRound:0,peak:1000,streak:0,bestStreak:0,ignored:0});
+const ST0=()=>({decisions:0,correct:0,hints:0,surrenders:0,hist:[],rounds:0,hands:0,wins:0,losses:0,pushes:0,bj:0,busts:0,doubles:0,doubleWins:0,splits:0,sideBets:0,sideWins:0,sideWon:0,insTaken:0,insWon:0,net:0,bestRound:0,worstRound:0,peak:1000,streak:0,bestStreak:0,ignored:0,cStreak:0,cBest:0});
 let ST=ST0();
+
+// ---------- achievements ----------
+// Teller-achievements lezen de statistieken; eenmalige gebeurtenissen (flag) worden tijdens het spel gezet.
+let A={got:{},flags:{}};
+const TIERS=["bronze","silver","gold","diamond"];
+const ACH=[
+  {id:"first_round",tier:"bronze",ok:()=>ST.rounds>=1},{id:"first_bj",tier:"bronze",ok:()=>ST.bj>=1},
+  {id:"first_split",tier:"bronze",ok:()=>ST.splits>=1},{id:"double_win",tier:"bronze",ok:()=>ST.doubleWins>=1},
+  {id:"side_win",tier:"bronze",ok:()=>ST.sideWins>=1},{id:"retreat",tier:"bronze",ok:()=>ST.surrenders>=1},
+  {id:"streak3",tier:"bronze",goal:3,cur:()=>ST.bestStreak},{id:"rounds10",tier:"bronze",goal:10,cur:()=>ST.rounds},
+  {id:"streak5",tier:"silver",goal:5,cur:()=>ST.bestStreak},{id:"five_card",tier:"silver",flag:true},
+  {id:"sweep",tier:"silver",flag:true},{id:"insured",tier:"silver",ok:()=>ST.insWon>=1},
+  {id:"bank2500",tier:"silver",goal:2500,cur:()=>ST.peak,money:true},{id:"rounds100",tier:"silver",goal:100,cur:()=>ST.rounds},
+  {id:"bj10",tier:"silver",goal:10,cur:()=>ST.bj},{id:"correct25",tier:"silver",goal:25,cur:()=>ST.cBest},
+  {id:"bj3",tier:"gold",flag:true},{id:"streak10",tier:"gold",goal:10,cur:()=>ST.bestStreak},
+  {id:"correct100",tier:"gold",goal:100,cur:()=>ST.cBest},{id:"perfect_pair",tier:"gold",flag:true},
+  {id:"bank10000",tier:"gold",goal:10000,cur:()=>ST.peak,money:true},{id:"bigwin",tier:"gold",goal:1000,cur:()=>Math.max(0,ST.bestRound),money:true},
+  {id:"suited_trips",tier:"diamond",flag:true},{id:"split4",tier:"diamond",flag:true},
+  {id:"bank100000",tier:"diamond",goal:100000,cur:()=>ST.peak,money:true},{id:"rounds1000",tier:"diamond",goal:1000,cur:()=>ST.rounds},
+  {id:"all",tier:"diamond",ok:()=>ACH.every(a=>a.id==="all"||A.got[a.id])}];
+const achDone=a=>a.flag?!!A.flags[a.id]:a.goal?a.cur()>=a.goal:a.ok();
+let achReady=false,toastQ=[],toastT=null;
+function checkAch(){let n=false;
+  for(let pass=0;pass<2;pass++)for(const a of ACH)if(!A.got[a.id]&&achDone(a)){A.got[a.id]=Date.now();n=true;if(achReady)toastQ.push(a.id)}
+  if(n)saveAch();
+  if(toastQ.length&&!toastT)toastT=setTimeout(showToast,900)}
+function showToast(){const id=toastQ.shift();if(!id){toastT=null;return}
+  const a=ACH.find(x=>x.id===id),el=$("toast");
+  el.innerHTML=`<span class="medal ${a.tier}" aria-hidden="true">🏆</span><span><small>${esc(t("achUnlocked"))} · ${esc(t("tier_"+a.tier))}</small><b>${esc(t("ach_"+id)[0])}</b></span>`;
+  el.hidden=false;el.classList.remove("show");void el.offsetWidth;el.classList.add("show");sfx("ach");
+  toastT=setTimeout(()=>{el.classList.remove("show");toastT=setTimeout(()=>{el.hidden=true;showToast()},350)},3500)}
+function saveAch(){try{localStorage.setItem("bj-ach",JSON.stringify(A))}catch(e){}}
+function loadAch(){try{const x=JSON.parse(localStorage.getItem("bj-ach")||"null");if(x&&x.got)A={got:x.got||{},flags:x.flags||{}}}catch(e){}}
 
 // ---------- talen ----------
 const euro=n=>(n<0?"−€":"€")+Math.abs(n);
@@ -299,7 +403,26 @@ nl:{
   shuffled:"Nieuwe schoen geschud",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
   insLost:"Dealer heeft geen blackjack: verzekering verloren",insWin:(i,w)=>`Hand ${i}: verzekering +€${w}`,
   refill:"Saldo op: je krijgt €1000 erbij",
-  restart:"Opnieuw beginnen",restartConfirm:"Klik nogmaals: saldo wordt €1000",restartAria:"Opnieuw beginnen met €1000",
+  restart:"Opnieuw beginnen met €1000",restartConfirm:"Klik nogmaals: saldo wordt €1000",restartAria:"Opnieuw beginnen met €1000",
+  menu:"Menu",close:"Sluiten",tSettings:"Instellingen",tStats:"Statistieken",tAch:(n,m)=>`Achievements ${n}/${m}`,
+  sGeneral:"Algemeen",sLang:"Taal",sSound:"Geluid",sWarn:"Waarschuwingen",sWarnSub:"Bij overduidelijke fouten vraagt het spel of je het zeker weet",
+  on:"Aan",off:"Uit",restartNote:"Je saldo gaat terug naar €1000. Een ronde die bezig is vervalt. Je statistieken en achievements blijven bewaard.",
+  achSum:(n,m)=>`Je hebt ${n} van de ${m} achievements behaald.`,achGot:d=>`Behaald op ${d}`,achUnlocked:"Achievement behaald",
+  tier_bronze:"Brons",tier_silver:"Zilver",tier_gold:"Goud",tier_diamond:"Diamant",
+  ach_first_round:["Eerste stappen","Speel je eerste ronde"],ach_first_bj:["Natural","Krijg je eerste blackjack"],
+  ach_first_split:["Uit elkaar","Splits voor het eerst"],ach_double_win:["Dubbel of niks","Win een verdubbelde hand"],
+  ach_side_win:["Gokje","Win een sidebet"],ach_retreat:["Wijze terugtocht","Geef een hand op"],
+  ach_streak3:["Drie op rij","Win 3 rondes achter elkaar"],ach_rounds10:["Op dreef","Speel 10 rondes"],
+  ach_streak5:["Op rij","Win 5 rondes achter elkaar"],ach_five_card:["Vijf kaarten","Win een hand met 5 of meer kaarten"],
+  ach_sweep:["Volle tafel","Speel op alle drie de handen en win ze allemaal in één ronde"],ach_insured:["Verzekerd","Krijg je verzekering uitbetaald"],
+  ach_bank2500:["Dubbel kapitaal","Bereik een saldo van €2.500"],ach_rounds100:["Vaste gast","Speel 100 rondes"],
+  ach_bj10:["Blackjack-jager","Krijg 10 blackjacks"],ach_correct25:["Leerling","Neem 25 keer achter elkaar de juiste beslissing volgens de basisstrategie"],
+  ach_bj3:["Drie keer raak","Krijg 3 blackjacks in één ronde"],ach_streak10:["Ongenaakbaar","Win 10 rondes achter elkaar"],
+  ach_correct100:["Boekhouder","Neem 100 keer achter elkaar de juiste beslissing volgens de basisstrategie"],ach_perfect_pair:["Perfecte pair","Raak een perfecte pair (25 : 1)"],
+  ach_bank10000:["Rijk","Bereik een saldo van €10.000"],ach_bigwin:["Grote klapper","Win €1.000 of meer in één ronde"],
+  ach_suited_trips:["Jackpot","Raak drie gelijke van hetzelfde teken bij 21+3 (100 : 1)"],ach_split4:["Splitkoning","Splits tot 4 handen en win ze alle vier"],
+  ach_bank100000:["Tycoon","Bereik een saldo van €100.000"],ach_rounds1000:["Volhouder","Speel 1.000 rondes"],
+  ach_all:["Verzamelaar","Haal alle andere achievements"],
   restarted:"Je begint opnieuw met €1000. Kies een fiche en klik op een inzetvak",
   pPerfect:"Perfecte pair",pColored:"Gekleurde pair",pMixed:"Gemengde pair",tSuitedTrips:"Drie gelijke, zelfde teken",
   tStraightFlush:"Straight flush",tTrips:"Drie gelijke",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
@@ -364,7 +487,26 @@ en:{
   shuffled:"New shoe shuffled",sideWin:(i,n,w)=>`Hand ${i}: ${t(n)} +€${w}`,
   insLost:"Dealer has no blackjack: insurance lost",insWin:(i,w)=>`Hand ${i}: insurance +€${w}`,
   refill:"Out of money: you get another €1000",
-  restart:"Start over",restartConfirm:"Click again: balance becomes €1000",restartAria:"Start over with €1000",
+  restart:"Start over with €1000",restartConfirm:"Click again: balance becomes €1000",restartAria:"Start over with €1000",
+  menu:"Menu",close:"Close",tSettings:"Settings",tStats:"Statistics",tAch:(n,m)=>`Achievements ${n}/${m}`,
+  sGeneral:"General",sLang:"Language",sSound:"Sound",sWarn:"Warnings",sWarnSub:"The game asks if you're sure when you make an obvious mistake",
+  on:"On",off:"Off",restartNote:"Your balance goes back to €1000. A round in progress is cancelled. Your statistics and achievements are kept.",
+  achSum:(n,m)=>`You have unlocked ${n} of ${m} achievements.`,achGot:d=>`Unlocked on ${d}`,achUnlocked:"Achievement unlocked",
+  tier_bronze:"Bronze",tier_silver:"Silver",tier_gold:"Gold",tier_diamond:"Diamond",
+  ach_first_round:["First steps","Play your first round"],ach_first_bj:["Natural","Get your first blackjack"],
+  ach_first_split:["Splitting up","Split for the first time"],ach_double_win:["Double or nothing","Win a doubled hand"],
+  ach_side_win:["Side hustle","Win a side bet"],ach_retreat:["Tactical retreat","Surrender a hand"],
+  ach_streak3:["Three in a row","Win 3 rounds in a row"],ach_rounds10:["Warming up","Play 10 rounds"],
+  ach_streak5:["On a roll","Win 5 rounds in a row"],ach_five_card:["Five-card hand","Win a hand with 5 or more cards"],
+  ach_sweep:["Clean sweep","Play all three hands and win them all in one round"],ach_insured:["Covered","Get your insurance paid out"],
+  ach_bank2500:["Doubled up","Reach a balance of €2,500"],ach_rounds100:["Regular","Play 100 rounds"],
+  ach_bj10:["Blackjack hunter","Get 10 blackjacks"],ach_correct25:["Student","Make the basic-strategy play 25 times in a row"],
+  ach_bj3:["Triple natural","Get 3 blackjacks in one round"],ach_streak10:["Untouchable","Win 10 rounds in a row"],
+  ach_correct100:["By the book","Make the basic-strategy play 100 times in a row"],ach_perfect_pair:["Perfect pair","Hit a perfect pair (25 : 1)"],
+  ach_bank10000:["High roller","Reach a balance of €10,000"],ach_bigwin:["Big score","Win €1,000 or more in one round"],
+  ach_suited_trips:["Jackpot","Hit suited three of a kind on 21+3 (100 : 1)"],ach_split4:["Split king","Split into 4 hands and win all four"],
+  ach_bank100000:["Tycoon","Reach a balance of €100,000"],ach_rounds1000:["Marathon","Play 1,000 rounds"],
+  ach_all:["Completionist","Unlock every other achievement"],
   restarted:"You start over with €1000. Pick a chip and click a betting spot",
   pPerfect:"Perfect pair",pColored:"Coloured pair",pMixed:"Mixed pair",tSuitedTrips:"Suited three of a kind",
   tStraightFlush:"Straight flush",tTrips:"Three of a kind",tStraight:"Straight",tFlush:"Flush",dPair:"Dealer pair",
@@ -432,7 +574,8 @@ const SFX={
   lose:w=>{tone(311,.3,"sawtooth",.05,w,247);tone(233,.45,"sawtooth",.05,w+.22,175)},
   push:w=>{tone(440,.15,"sine",.08,w);tone(440,.15,"sine",.08,w+.18)},
   bust:w=>noise(.25,.3,w,300),
-  warn:w=>{tone(880,.09,"square",.04,w);tone(660,.12,"square",.04,(w||0)+.12)}
+  warn:w=>{tone(880,.09,"square",.04,w);tone(660,.12,"square",.04,(w||0)+.12)},
+  ach:w=>{[784,988,1175,1568].forEach((f,i)=>tone(f,.18,"triangle",.09,w+i*.07));tone(2349,.6,"sine",.04,w+.3)}
 };
 function sfx(name,when){if(P.sound&&armed&&SFX[name])SFX[name](when||0)}
 
@@ -462,7 +605,8 @@ function t213Res(cs){
   if(flush)return{name:"tFlush",mult:5};
   return null}
 function settleSide(s,i,key,r){const stake=s[key];if(!stake)return;ST.sideBets++;
-  if(r){const win=stake*r.mult;S.bank+=stake+win;s.res[key]={win};ST.sideWins++;ST.sideWon+=win;S.notes.push({k:"sideWin",a:[i+1,r.name,win]})}
+  if(r){const win=stake*r.mult;S.bank+=stake+win;s.res[key]={win};ST.sideWins++;ST.sideWon+=win;
+    if(r.name==="pPerfect")A.flags.perfect_pair=true;if(r.name==="tSuitedTrips")A.flags.suited_trips=true;S.notes.push({k:"sideWin",a:[i+1,r.name,win]})}
   else s.res[key]={win:0}}
 
 // ---------- inzetten ----------
@@ -497,8 +641,8 @@ function deal(){
 function nextInsSeat(from){for(let i=from+1;i<3;i++)if(S.seats[i].bet)return i;return null}
 function insDecide(yes){if(S.phase!=="ins")return;const s=S.seats[S.insSeat];
   ST.decisions++;
-  if(yes){const a=Math.floor(s.bet/2);if(a<=S.bank){S.bank-=a;s.ins=a;ST.insTaken++;sfx("chip")}}
-  else ST.correct++;
+  if(yes){const a=Math.floor(s.bet/2);if(a<=S.bank){S.bank-=a;s.ins=a;ST.insTaken++;sfx("chip")}ST.cStreak=0}
+  else{ST.correct++;ST.cStreak++;ST.cBest=Math.max(ST.cBest,ST.cStreak)}
   S.insSeat=nextInsSeat(S.insSeat);if(S.insSeat==null)afterIns();else render()}
 function afterIns(){
   S.insSeat=null;const up=S.dealer[0];
@@ -567,7 +711,9 @@ function act(name){if(S.phase!=="play"||S.pending)return;const seat=S.seats[S.cu
   if((name==="double"&&!canDouble(h))||(name==="split"&&!canSplit(seat,h))||(name==="surrender"&&!canSurrender(seat,h)))return;
   const w=P.tips&&mistake(name);
   if(w){S.pending={name,m:w};sfx("warn");return render()}doAction(name)}
-function doAction(name){const a=advise(S.seats[S.cur.s],curHand());ST.decisions++;if(a.action===name)ST.correct++;ACTIONS[name]()}
+function doAction(name){const a=advise(S.seats[S.cur.s],curHand());ST.decisions++;
+  if(a.action===name){ST.correct++;ST.cStreak++;ST.cBest=Math.max(ST.cBest,ST.cStreak)}else ST.cStreak=0;
+  ACTIONS[name]()}
 function confirmPending(go){const p=S.pending;S.pending=null;if(go&&p){ST.ignored++;doAction(p.name)}else render()}
 
 function dealerPlay(){
@@ -576,7 +722,7 @@ function dealerPlay(){
   settle()}
 function settle(){
   S.phase="done";S.cur=null;
-  const d=tot(S.dealer).t,dBJ=S.dealer.length===2&&d===21;let anyBJ=false;
+  const d=tot(S.dealer).t,dBJ=S.dealer.length===2&&d===21;let anyBJ=false,bjWins=0;
   S.seats.forEach((s,i)=>{
     if(!s.bet)return;
     if(s.ins&&dBJ){const w=s.ins*2;S.bank+=s.ins*3;s.res.ins={win:w};ST.insWon++;S.notes.push({k:"insWin",a:[i+1,w]})}
@@ -591,9 +737,14 @@ function settle(){
       S.bank+=pay;h.res={m:lab,cls};ST.hands++;
       if(h.surrendered)ST.surrenders++;
       else if(cls==="win"){ST.wins++;if(nat){ST.bj++;anyBJ=true}if(h.doubled)ST.doubleWins++}
-      else if(cls==="lose"){ST.losses++;if(v>21)ST.busts++}else ST.pushes++});
+      else if(cls==="lose"){ST.losses++;if(v>21)ST.busts++}else ST.pushes++;
+      if(cls==="win"&&nat)bjWins++;if(cls==="win"&&!h.surrendered&&h.cards.length>=5)A.flags.five_card=true});
+    if(s.hands.length===4&&s.hands.every(h=>h.res.cls==="win"))A.flags.split4=true;
     const[a,b]=S.dealer;settleSide(s,i,"dp",a.r===b.r?{name:"dPair",mult:11}:null);
   });
+  if(bjWins>=3)A.flags.bj3=true;
+  const played=S.seats.filter(s=>s.bet);
+  if(played.length===3&&played.every(s=>s.hands.every(h=>h.res.cls==="win")))A.flags.sweep=true;
   const net=S.bank-S.startBank;
   S.msg={k:"result",a:[dBJ,d>21,net]};
   S.cls=net>0?"win":net<0?"lose":"push";
@@ -619,7 +770,8 @@ function applyStatic(){
   document.documentElement.lang=L();document.title=t("docTitle");
   document.querySelectorAll("[data-t]").forEach(el=>{const txt=t(el.dataset.t),k=el.dataset.k;
     if(k)el.innerHTML=esc(txt)+`<kbd>${esc(k[0]==="@"?t(k.slice(1)):k)}</kbd>`;else el.textContent=txt});
-  const lb=$("langBtn");lb.textContent=t("langBtn");lb.setAttribute("aria-label",t("langAria"));lb.lang=L()==="nl"?"en":"nl";
+  $("langNl").setAttribute("aria-pressed",L()==="nl");$("langEn").setAttribute("aria-pressed",L()==="en");
+  $("closeBtn").setAttribute("aria-label",t("close"));
   $("siteFoot").innerHTML=t("foot");
   $("pay").innerHTML=t("pay").map(([h,rows],i,arr)=>`<div><h3>${h}</h3><table>${rows.map(([a,b])=>`<tr><td>${a}</td><td>${b}</td></tr>`).join("")}</table>${i===arr.length-1?`<p style="margin:6px 0 0">${t("payNote")}</p>`:""}</div>`).join("");
 }
@@ -648,9 +800,10 @@ function render(){
   newKeys.forEach(k=>seen.add(k));
   newDelays.forEach(dl=>sfx("card",dl));
   if(S.sfxEnd){sfx(S.sfxEnd,(newDelays.length?Math.max(...newDelays):0)+.35);S.sfxEnd=null}
-  $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=t(P.sound?"soundOn":"soundOff");
-  $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=t(P.tips?"warnOn":"warnOff");
-  $("restartBtn").textContent=t(restartArmed?"restartConfirm":"restart");$("restartBtn").setAttribute("aria-label",restartArmed?t("restartConfirm"):t("restartAria"));
+  $("soundBtn").setAttribute("aria-pressed",P.sound);$("soundBtn").textContent=t(P.sound?"on":"off");
+  $("tipsBtn").setAttribute("aria-pressed",P.tips);$("tipsBtn").textContent=t(P.tips?"on":"off");
+  $("restartBtn").textContent=t(restartArmed?"restartConfirm":"restart");
+  checkAch();renderAch();
   $("warnCtl").hidden=!S.pending;if(S.pending)$("warnText").textContent=S.pending.m?tm(S.pending.m):S.pending.text||"";
   renderStats();renderExtras();
   $("bank").textContent="€"+S.bank;
@@ -691,6 +844,20 @@ function chartSVG(){
     <circle class="dot" cx="${x(h.length-1)}" cy="${y(end)}" r="4"/>
     <text x="${pl-6}" y="${y(hi)+4}" text-anchor="end">${euro(hi)}</text><text x="${pl-6}" y="${y(lo)+4}" text-anchor="end">${euro(lo)}</text>
     <text x="${pl}" y="${H-6}">${t("chartStart")}</text><text x="${W-pr}" y="${H-6}" text-anchor="end">${t("chartNow")}: ${euro(end)}</text></svg>`}
+function renderAch(){
+  const got=ACH.filter(a=>A.got[a.id]).length,loc=L()==="nl"?"nl-NL":"en-GB";
+  const fmt=(n,m)=>(m?"€":"")+Math.floor(n).toLocaleString(loc);
+  $("tab-ach").textContent=t("tAch",got,ACH.length);
+  if($("panel").hidden||$("pane-ach").hidden)return;
+  $("achList").innerHTML=`<p class="tnote" style="margin:0 0 8px;text-align:left">${t("achSum",got,ACH.length)}</p><div class="pbar"><i style="width:${(got/ACH.length*100).toFixed(1)}%"></i></div>`
+    +TIERS.map(tier=>`<h3 class="tier-h">${t("tier_"+tier)}</h3><ul class="ach">${ACH.filter(a=>a.tier===tier).map(a=>{
+      const g=A.got[a.id],[n,d]=t("ach_"+a.id);let prog="";
+      if(!g&&a.goal){const c=Math.min(Math.max(0,a.cur()),a.goal);prog=`<div class="pbar sm"><i style="width:${(c/a.goal*100).toFixed(1)}%"></i></div><small>${fmt(c,a.money)} / ${fmt(a.goal,a.money)}</small>`}
+      return`<li class="${g?"got":""}"><span class="medal ${tier}" aria-hidden="true">${g?"🏆":"🔒"}</span><div><b>${esc(n)}</b><span>${esc(d)}</span>${g?`<small class="when">${esc(t("achGot",new Date(g).toLocaleDateString(loc)))}</small>`:prog}</div></li>`}).join("")}</ul>`).join("")}
+let menuOpen=false,lastFocus=null,curTab="settings";
+function setTab(x){curTab=x;["settings","stats","ach"].forEach(k=>{$("tab-"+k).setAttribute("aria-selected",k===x);$("tab-"+k).tabIndex=k===x?0:-1;$("pane-"+k).hidden=k!==x});renderAch()}
+function openMenu(tab){menuOpen=true;lastFocus=document.activeElement;$("overlay").hidden=false;$("panel").hidden=false;document.body.classList.add("noscroll");setTab(tab||curTab);$("closeBtn").focus()}
+function closeMenu(){menuOpen=false;$("overlay").hidden=true;$("panel").hidden=true;document.body.classList.remove("noscroll");($("menuBtn")).focus()}
 function tableHTML(title,id,keys,label,data,hl){
   const on=hl&&hl.tbl===id,LET=t("letters");
   return`<div><h3>${title}</h3><div class="tw"><table><thead><tr><th></th>${COLS.map((c,i)=>`<th class="${on&&hl.col===i?"hl":""}">${c}</th>`).join("")}</tr></thead><tbody>
@@ -744,7 +911,16 @@ $("hit").onclick=()=>act("hit");$("stand").onclick=()=>act("stand");$("double").
 $("warnGo").onclick=()=>confirmPending(true);$("warnCancel").onclick=()=>confirmPending(false);
 $("soundBtn").onclick=()=>{P.sound=!P.sound;render();sfx("chip")};
 $("tipsBtn").onclick=()=>{P.tips=!P.tips;if(!P.tips)S.pending=null;render()};
-$("langBtn").onclick=()=>{P.lang=L()==="nl"?"en":"nl";render()};
+$("langNl").onclick=()=>{P.lang="nl";render()};$("langEn").onclick=()=>{P.lang="en";render()};
+$("menuBtn").onclick=()=>openMenu();$("closeBtn").onclick=closeMenu;$("overlay").onclick=closeMenu;
+document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+$("toast").onclick=()=>openMenu("ach");
+$("panel").addEventListener("keydown",e=>{
+  if(e.key==="Tab"){const f=[...$("panel").querySelectorAll("button,select")].filter(x=>!x.disabled&&x.offsetParent!==null&&x.tabIndex!==-1);
+    if(!f.length)return;const first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}
+  if(e.target.getAttribute("role")==="tab"&&(e.key==="ArrowRight"||e.key==="ArrowLeft")){const k=["settings","stats","ach"],i=k.indexOf(curTab);
+    setTab(k[(i+(e.key==="ArrowRight"?1:2))%3]);$("tab-"+curTab).focus();e.preventDefault()}});
 $("resetStats").onclick=()=>{
   if(resetArmed){clearTimeout(resetArmed);resetArmed=null;ST=ST0();ST.peak=S.bank;render();return}
   resetArmed=setTimeout(()=>{resetArmed=null;renderStats()},3000);renderStats()};
@@ -757,6 +933,7 @@ $("rDbl").onchange=e=>setRule("dbl911",e.target.value==="1");
 const PLAYKEYS={"1":"hit","2":"stand","3":"double","4":"split","5":"surrender"};
 addEventListener("keydown",e=>{
   if(e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;
+  if(menuOpen){if(e.key==="Escape"){closeMenu();e.preventDefault()}return}
   if(e.target.closest&&e.target.closest("input,textarea,select,summary"))return;
   const k=e.key.toLowerCase();let ok=true;
   const chip=["1","2","3","4"].indexOf(k);
@@ -770,7 +947,7 @@ addEventListener("keydown",e=>{
 
 addEventListener("pagehide",save);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")save()});
-function start(data){load();if(data&&data.S&&data.S.seats){S=Object.assign({},S_DEF,data.S);if(data.ST)ST=data.ST;if(data.P)P=data.P}render()}
+function start(data){load();loadAch();checkAch();achReady=true;if(data&&data.S&&data.S.seats){S=Object.assign({},S_DEF,data.S);if(data.ST)ST=data.ST;if(data.P)P=data.P}render()}
 window.claude?.hot?.snapshot?.(()=>({S,ST,P}));
 window.claude?.hot?.ready?window.claude.hot.ready(start):start(window.claude?.hot?.data??{});
 </script>
