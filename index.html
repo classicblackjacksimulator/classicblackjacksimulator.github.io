@@ -119,6 +119,11 @@ kbd{font-family:var(--f-mono);font-size:10px;border:1px solid currentColor;borde
 .spot{border-radius:50%;border:2px dashed color-mix(in srgb,var(--brass) 70%,transparent);background:transparent;color:var(--ivory);font-family:var(--f-mono);font-variant-numeric:tabular-nums;cursor:pointer;display:grid;place-items:center;padding:0}
 .spot.main{width:58px;height:58px;font-size:14px}
 .spot.sm{width:36px;height:36px;font-size:11px}
+.spotwrap{position:relative;display:inline-grid}
+.rm{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--lose);color:var(--felt-deep);border:2px solid var(--felt-deep);font:800 13px/1 var(--f-body);display:grid;place-items:center;cursor:pointer;padding:0;z-index:2}
+.rm.sm{width:18px;height:18px;font-size:11px;top:-6px;right:-6px}
+.rm:hover{filter:brightness(1.1)}
+.rm:focus-visible{outline:3px solid var(--brass);outline-offset:1px}
 .spot.has{border-style:solid;border-color:var(--brass);background:var(--felt-deep)}
 .spot.won{border-color:var(--win);color:var(--win)}
 .spot.lost{opacity:.45}
@@ -252,6 +257,7 @@ body.noscroll{overflow:hidden}
       <button class="btn ghost" id="clearAll" data-t="clearAll">Wis alles</button>
       <button class="btn ghost" id="rebet" data-t="rebet" data-k="7">Herhaal inzet</button>
       <button class="btn ghost" id="betX2" data-t="betX2" data-k="8">Inzet ×2</button>
+      <button class="btn ghost" id="undoBtn" data-t="undo" data-k="9">Ongedaan maken</button>
       <button class="btn primary" id="deal" data-t="deal" data-k="@kSpace">Delen</button>
     </div>
     <div class="row" id="insCtl" hidden>
@@ -352,7 +358,7 @@ const SPOTS=["bet","pair","t213","dp"];
 const mkSeat=()=>({bet:0,pair:0,t213:0,dp:0,ins:0,hands:[],res:{}});
 let S={bank:1000,phase:"bet",chip:25,shoe:[],uid:0,dealer:[],seats:[mkSeat(),mkSeat(),mkSeat()],cur:null,insSeat:null,
   msg:{k:"pickChip"},cls:"",notes:[],last:null,startBank:1000,pending:null,sfxEnd:null};
-const S_DEF={pending:null,sfxEnd:null};
+const S_DEF={pending:null,sfxEnd:null,undo:[]};
 let P={sound:true,tips:true,lang:null,rules:{decks:6,h17:false,bj:1.5,dbl911:false}};
 const R=()=>P.rules;
 const ST0=()=>({decisions:0,correct:0,hints:0,surrenders:0,hist:[],rounds:0,hands:0,wins:0,losses:0,pushes:0,bj:0,busts:0,doubles:0,doubleWins:0,splits:0,sideBets:0,sideWins:0,sideWon:0,insTaken:0,insWon:0,net:0,bestRound:0,worstRound:0,peak:1000,streak:0,bestStreak:0,ignored:0,cStreak:0,cBest:0});
@@ -404,7 +410,8 @@ nl:{
   hit:"Kaart",stand:"Pas",double:"Verdubbel",split:"Splits",surrender:"Opgeven",
   careful:"Let op:",warnCancel:"Toch niet",warnGo:"Toch doen",
   newRound:"Nieuwe inzet",again:"Zelfde inzet & delen",againX2:"Dubbele inzet & delen",noFundsAgainX2:"Niet genoeg saldo voor een dubbele inzet",
-  betHint:"Speel op één, twee of drie handen. Klik een vak om het gekozen fiche in te zetten. Toetsen: 1 tot 6 kiest een fiche, 7 herhaalt je inzet, 8 verdubbelt je inzet, spatie deelt.",
+  betHint:"Speel op één, twee of drie handen. Klik een vak om het gekozen fiche in te zetten. Klik op het kruisje om een inzet te verwijderen. Toetsen: 1 tot 6 kiest een fiche, 7 herhaalt je inzet, 8 verdubbelt je inzet, 9 maakt ongedaan, spatie deelt.",
+  undo:"Ongedaan maken",mainBet:"hoofd",rmAria:(l,i)=>`Verwijder ${l} inzet hand ${i}`,
   betX2:"Inzet ×2",totalBet:n=>`Totale inzet: €${n.toLocaleString("nl-NL")}`,cuePlay:"▶ Klik om te spelen",
   noFundsX2:"Niet genoeg saldo om je inzet te verdubbelen",
   insHint:"Verzekering kost de helft van je inzet en betaalt 2 : 1 als de dealer blackjack heeft.",
@@ -490,7 +497,8 @@ en:{
   hit:"Hit",stand:"Stand",double:"Double",split:"Split",surrender:"Surrender",
   careful:"Careful:",warnCancel:"Never mind",warnGo:"Do it anyway",
   newRound:"New bet",again:"Same bet & deal",againX2:"Double bet & deal",noFundsAgainX2:"Not enough balance for a double bet",
-  betHint:"Play one, two or three hands. Click a spot to place the selected chip. Keys: 1 to 6 picks a chip, 7 repeats your bet, 8 doubles your bet, space deals.",
+  betHint:"Play one, two or three hands. Click a spot to place the selected chip. Click the cross to remove a bet. Keys: 1 to 6 picks a chip, 7 repeats your bet, 8 doubles your bet, 9 undoes, space deals.",
+  undo:"Undo",mainBet:"main",rmAria:(l,i)=>`Remove ${l} bet hand ${i}`,
   betX2:"Bet ×2",totalBet:n=>`Total bet: €${n.toLocaleString("en-GB")}`,cuePlay:"▶ Click to play",
   noFundsX2:"Not enough balance to double your bet",
   insHint:"Insurance costs half your bet and pays 2 : 1 if the dealer has blackjack.",
@@ -633,16 +641,23 @@ function addBet(i,spot){
   const s=S.seats[i];
   if(spot!=="bet"&&!s.bet){S.msg={k:"needMain",a:[i+1]};S.cls="";return render()}
   if(S.chip>S.bank){S.msg={k:"noFunds"};S.cls="lose";return render()}
-  s[spot]+=S.chip;S.bank-=S.chip;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
+  snap();s[spot]+=S.chip;S.bank-=S.chip;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
 function clearSeat(i){const s=S.seats[i];for(const k of SPOTS){S.bank+=s[k];s[k]=0}render()}
+// Ongedaan maken: voor elke wijziging aan de inzetten wordt de vorige stand bewaard (alleen tijdens het inzetten).
+function snap(){if(!S.undo)S.undo=[];S.undo.push({bank:S.bank,b:S.seats.map(x=>({bet:x.bet,pair:x.pair,t213:x.t213,dp:x.dp}))});if(S.undo.length>50)S.undo.shift()}
+function undo(){if(S.phase!=="bet"||!S.undo||!S.undo.length)return;const u=S.undo.pop();S.bank=u.bank;
+  u.b.forEach((b,i)=>{for(const k of SPOTS)S.seats[i][k]=b[k]});sfx("chip");S.msg=tableBets()?{k:"ready"}:{k:"pickChip"};S.cls="";render()}
+function removeSpot(i,k){if(S.phase!=="bet")return;const s=S.seats[i];if(!s[k])return;snap();
+  const ks=k==="bet"?SPOTS:[k];for(const x of ks){S.bank+=s[x];s[x]=0}
+  sfx("chip");S.msg=tableBets()?{k:"ready"}:{k:"pickChip"};S.cls="";render()}
 function clearAll(){S.seats.forEach(s=>{for(const k of SPOTS){S.bank+=s[k];s[k]=0}})}
-function newRound(){S.phase="bet";S.dealer=[];S.cur=null;S.insSeat=null;S.notes=[];
+function newRound(){S.phase="bet";S.dealer=[];S.cur=null;S.insSeat=null;S.notes=[];S.undo=[];
   S.seats.forEach(s=>{s.hands=[];s.res={};s.ins=0;for(const k of SPOTS)s[k]=0});seen.clear();
   S.msg={k:"pickChip"};S.cls=""}
 const CHIPS=[5,25,100,500,1000,5000];
 function betX2(){if(S.phase!=="bet")return;const tb=tableBets();if(!tb)return;
   if(tb>S.bank){S.msg={k:"noFundsX2"};S.cls="lose";return render()}
-  S.seats.forEach(s=>{for(const k of SPOTS)s[k]*=2});S.bank-=tb;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
+  snap();S.seats.forEach(s=>{for(const k of SPOTS)s[k]*=2});S.bank-=tb;sfx("chip");S.msg={k:"ready"};S.cls="";render()}
 function cueAction(){
   if(S.phase==="bet"&&tableBets()>0)return"deal";
   return null}
@@ -656,7 +671,7 @@ function placeLast(){if(!S.last)return false;clearAll();
 function deal(){
   if(S.phase!=="bet"||!S.seats.some(s=>s.bet))return;
   S.last=S.seats.map(s=>({bet:s.bet,pair:s.pair,t213:s.t213,dp:s.dp}));
-  S.startBank=S.bank+tableBets();S.notes=[];S.dealer=[];
+  S.startBank=S.bank+tableBets();S.notes=[];S.dealer=[];S.undo=[];
   S.seats.forEach(s=>{s.res={};s.ins=0;s.hands=s.bet?[{cards:[],bet:s.bet,done:false,split:false}]:[]});
   for(let n=0;n<2;n++){S.seats.forEach(s=>{if(s.bet)s.hands[0].cards.push(draw())});S.dealer.push(draw())}
   S.seats.forEach((s,i)=>{if(!s.bet)return;const[a,b]=s.hands[0].cards;
@@ -815,13 +830,13 @@ function render(){
       return`<div class="hand${cur?" on":""}"><div class="cards">${h.cards.map(c=>cardHTML(c,false)).join("")}</div>
       <div class="meta"><span class="score">${scoreText(h.cards)}</span>${s.hands.length>1||h.doubled?`<span class="tag">${euro(h.bet)}${h.doubled?" 2×":""}</span>`:""}${h.res?`<span class="tag ${h.res.cls}">${esc(h.res.m?tm(h.res.m):h.res.label||"")}</span>`:""}</div></div>`}).join("");
     const side=(k,l)=>{const r=s.res[k],cls=r?(r.win?" won":" lost"):"";
-      return`<div class="side"><button class="spot sm${s[k]?" has":""}${cls}" data-seat="${i}" data-spot="${k}" ${betting?"":"disabled"} aria-label="${esc(t("sideAria",l,i+1))}">${s[k]||""}</button><span class="l${r&&r.win?" win":""}">${r&&r.win?"+"+euro(r.win):l}</span></div>`};
+      return`<div class="side"><span class="spotwrap"><button class="spot sm${s[k]?" has":""}${cls}" data-seat="${i}" data-spot="${k}" ${betting?"":"disabled"} aria-label="${esc(t("sideAria",l,i+1))}">${s[k]||""}</button>${S.phase==="bet"&&s[k]?`<button class="rm sm" data-rm-seat="${i}" data-rm-spot="${k}" aria-label="${esc(t("rmAria",l,i+1))}">×</button>`:""}</span><span class="l${r&&r.win?" win":""}">${r&&r.win?"+"+euro(r.win):l}</span></div>`};
     const ins=s.ins?`<span class="tag${s.res.ins?(s.res.ins.win?" win":" lose"):""}">${t("insTag",s.ins)}</span>`:"";
     return`<div class="seat${on?" on":""}${idle?" idle":""}">
       <div class="hands">${hands}</div>
-      <div class="spots"><button class="spot main${s.bet?" has":""}" data-seat="${i}" data-spot="bet" ${betting?"":"disabled"} aria-label="${esc(t("mainAria",i+1))}">${s.bet?euro(s.bet):"+"}</button>
+      <div class="spots"><span class="spotwrap"><button class="spot main${s.bet?" has":""}" data-seat="${i}" data-spot="bet" ${betting?"":"disabled"} aria-label="${esc(t("mainAria",i+1))}">${s.bet?euro(s.bet):"+"}</button>${S.phase==="bet"&&s.bet?`<button class="rm" data-rm-seat="${i}" data-rm-spot="bet" aria-label="${esc(t("rmAria",t("mainBet"),i+1))}">×</button>`:""}</span>
       <div class="sides">${side("pair","Pair")}${side("t213","21+3")}${side("dp","D-pair")}</div></div>
-      <div class="seat-foot">${t("hand",i+1)}${ins}${S.phase==="bet"&&(s.bet||s.pair||s.t213||s.dp)?` <button class="x" data-clear="${i}">${t("clear")}</button>`:""}</div></div>`}).join("");
+      <div class="seat-foot">${t("hand",i+1)}${ins}</div></div>`}).join("");
   newKeys.forEach(k=>seen.add(k));
   newDelays.forEach(dl=>sfx("card",dl));
   if(S.sfxEnd){sfx(S.sfxEnd,(newDelays.length?Math.max(...newDelays):0)+.35);S.sfxEnd=null}
@@ -839,7 +854,7 @@ function render(){
   $("betCtl").hidden=S.phase!=="bet";$("insCtl").hidden=S.phase!=="ins";$("playCtl").hidden=S.phase!=="play"||!!S.pending;$("doneCtl").hidden=S.phase!=="done";
   $("deal").disabled=!S.seats.some(s=>s.bet);
   $("clearAll").disabled=!tableBets();
-  $("rebet").disabled=!S.last;
+  $("rebet").disabled=!S.last;$("undoBtn").disabled=!(S.undo&&S.undo.length);
   $("betX2").disabled=!tableBets()||tableBets()>S.bank;
   if(S.phase==="bet"&&tableBets()&&S.msg&&S.msg.k==="ready")$("msg").textContent=t("totalBet",tableBets());
   const cue=cueAction();$("cue").hidden=!cue;if(cue)$("cue").textContent=t("cuePlay");
@@ -933,11 +948,12 @@ function restart(){const chip=S.chip,last=S.last;
 $("restartBtn").onclick=()=>{
   if(restartArmed){clearTimeout(restartArmed);restartArmed=null;restart();render();return}
   restartArmed=setTimeout(()=>{restartArmed=null;render()},3000);render()};
-$("seats").addEventListener("click",e=>{const b=e.target.closest("[data-spot]");if(b)return addBet(+b.dataset.seat,b.dataset.spot);
+$("seats").addEventListener("click",e=>{const rm=e.target.closest("[data-rm-spot]");if(rm)return removeSpot(+rm.dataset.rmSeat,rm.dataset.rmSpot);const b=e.target.closest("[data-spot]");if(b)return addBet(+b.dataset.seat,b.dataset.spot);
   const x=e.target.closest("[data-clear]");if(x)clearSeat(+x.dataset.clear)});
 document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{S.chip=+c.dataset.v;render()});
-$("clearAll").onclick=()=>{clearAll();render()};
-$("rebet").onclick=()=>{placeLast();render()};
+$("clearAll").onclick=()=>{if(tableBets())snap();clearAll();S.msg={k:"pickChip"};render()};
+$("undoBtn").onclick=undo;
+$("rebet").onclick=()=>{snap();placeLast();render()};
 $("deal").onclick=deal;
 $("betX2").onclick=betX2;
 $("cue").onclick=runCue;
@@ -969,6 +985,7 @@ $("rBJ").onchange=e=>setRule("bj",+e.target.value);
 $("rDbl").onchange=e=>setRule("dbl911",e.target.value==="1");
 const PLAYKEYS={"1":"hit","2":"stand","3":"double","4":"split","5":"surrender"};
 addEventListener("keydown",e=>{
+  if((e.metaKey||e.ctrlKey)&&!e.shiftKey&&e.key.toLowerCase()==="z"&&S.phase==="bet"&&!menuOpen&&!(e.target.closest&&e.target.closest("input,textarea,select"))){undo();e.preventDefault();return}
   if(e.metaKey||e.ctrlKey||e.altKey||e.repeat)return;
   if(menuOpen){if(e.key==="Escape"){closeMenu();e.preventDefault()}return}
   if(e.target.closest&&e.target.closest("input,textarea,select,summary"))return;
@@ -977,7 +994,7 @@ addEventListener("keydown",e=>{
   if(S.pending){if(k==="escape"||k==="enter"||k==="1")confirmPending(false);else if(k==="2")confirmPending(true);else ok=false}
   else if(S.phase==="play"){if(PLAYKEYS[k])act(PLAYKEYS[k]);else ok=false}
   else if(S.phase==="ins"){if(k==="1")insDecide(true);else if(k==="2")insDecide(false);else ok=false}
-  else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="7"){placeLast();render()}else if(k==="8")betX2();else if(chip>=0){S.chip=CHIPS[chip];render()}else ok=false}
+  else if(S.phase==="bet"){if(k===" "||k==="enter")deal();else if(k==="7"){snap();placeLast();render()}else if(k==="8")betX2();else if(k==="9")undo();else if(chip>=0){S.chip=CHIPS[chip];render()}else ok=false}
   else if(S.phase==="done"){if(k==="1"){newRound();render()}else if(k==="2"||k===" "||k==="enter")again();else if(k==="3")againX2();else ok=false}
   else ok=false;
   if(ok)e.preventDefault()});
